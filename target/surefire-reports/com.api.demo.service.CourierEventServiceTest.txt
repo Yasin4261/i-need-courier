@@ -1,0 +1,44 @@
+-------------------------------------------------------------------------------
+Test set: com.api.demo.service.CourierEventServiceTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 0.148 s <<< FAILURE! -- in com.api.demo.service.CourierEventServiceTest
+com.api.demo.service.CourierEventServiceTest.handleCourierStatusChange_online_shouldAddToQueueAndProcessOrders -- Time elapsed: 0.143 s <<< FAILURE!
+Argument(s) are different! Wanted:
+kafkaTemplate.send(
+    "courier-events",
+    <any string>
+);
+-> at org.springframework.kafka.core.KafkaTemplate.send(KafkaTemplate.java:596)
+Actual invocations have different arguments at position [1]:
+kafkaTemplate.send(
+    "courier-events",
+    {"message" = "Courier 1 joined the queue", "timestamp" = "2025-09-04T23:41:36.388702"}
+);
+-> at com.api.demo.service.CourierEventService.sendNotification(CourierEventService.java:224)
+
+	at org.springframework.kafka.core.KafkaTemplate.send(KafkaTemplate.java:596)
+	at com.api.demo.service.CourierEventServiceTest.handleCourierStatusChange_online_shouldAddToQueueAndProcessOrders(CourierEventServiceTest.java:39)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+com.api.demo.service.CourierEventServiceTest.handleCourierStatusChange_offline_shouldRemoveFromQueue -- Time elapsed: 0.003 s <<< FAILURE!
+Argument(s) are different! Wanted:
+kafkaTemplate.send(
+    "courier-events",
+    <any string>
+);
+-> at org.springframework.kafka.core.KafkaTemplate.send(KafkaTemplate.java:596)
+Actual invocations have different arguments at position [1]:
+kafkaTemplate.send(
+    "courier-events",
+    {"message" = "Courier 2 left the queue", "timestamp" = "2025-09-04T23:41:36.406200"}
+);
+-> at com.api.demo.service.CourierEventService.sendNotification(CourierEventService.java:224)
+
+	at org.springframework.kafka.core.KafkaTemplate.send(KafkaTemplate.java:596)
+	at com.api.demo.service.CourierEventServiceTest.handleCourierStatusChange_offline_shouldRemoveFromQueue(CourierEventServiceTest.java:51)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+

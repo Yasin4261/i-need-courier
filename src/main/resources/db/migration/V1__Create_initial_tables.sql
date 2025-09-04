@@ -53,8 +53,8 @@ CREATE TABLE coordinators (
     shift_end TIME,
     is_active BOOLEAN DEFAULT TRUE,
     status ENUM('ONLINE', 'OFFLINE', 'BUSY', 'ON_BREAK', 'IN_FIELD') DEFAULT 'OFFLINE',
-    current_latitude DECIMAL(10, 8),
-    current_longitude DECIMAL(11, 8),
+    current_latitude FLOAT,
+    current_longitude FLOAT,
     coverage_area VARCHAR(500) COMMENT 'Sorumlu olduğu bölge',
     max_courier_count INT DEFAULT 10 COMMENT 'Maksimum yönetebileceği kurye sayısı',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -82,8 +82,8 @@ CREATE TABLE couriers (
     shift_end TIME,
     is_available BOOLEAN DEFAULT TRUE,
     status ENUM('ONLINE', 'OFFLINE', 'BUSY', 'ON_BREAK', 'IN_DELIVERY') DEFAULT 'OFFLINE',
-    current_latitude DECIMAL(10, 8),
-    current_longitude DECIMAL(11, 8),
+    current_latitude FLOAT,
+    current_longitude FLOAT,
     current_location_name VARCHAR(200),
     total_deliveries INT DEFAULT 0,
     vehicle_id BIGINT,
@@ -113,8 +113,10 @@ CREATE TABLE businesses (
     email VARCHAR(100),
     address VARCHAR(500) NOT NULL,
     address_description TEXT COMMENT 'Adres tarifi - detaylı açıklama',
-    latitude DECIMAL(10, 8),
-    longitude DECIMAL(11, 8),
+
+
+    latitude FLOAT,
+    longitude FLOAT,
     location_name VARCHAR(200) COMMENT 'Konum ismi (Kadıköy, Merkez vb.)',
     business_type VARCHAR(100) COMMENT 'İşletme türü (Restaurant, Market, Eczane vb.)',
     payment_terms ENUM('PREPAID', 'POSTPAID', 'CASH_ON_DELIVERY') DEFAULT 'POSTPAID',
@@ -155,21 +157,21 @@ CREATE TABLE orders (
     -- Alım lokasyonu (işletmeden)
     pickup_address TEXT NOT NULL,
     pickup_address_description TEXT COMMENT 'Alım adresi tarifi',
-    pickup_latitude DECIMAL(10, 8),
-    pickup_longitude DECIMAL(11, 8),
+    pickup_latitude FLOAT,
+    pickup_longitude FLOAT,
     pickup_location_name VARCHAR(200),
     pickup_contact_person VARCHAR(100) COMMENT 'Alım yerindeki irtibat kişisi',
 
     -- Teslimat lokasyonu (son müşteriye)
     delivery_address TEXT NOT NULL,
     delivery_address_description TEXT COMMENT 'Teslimat adresi tarifi',
-    delivery_latitude DECIMAL(10, 8),
-    delivery_longitude DECIMAL(11, 8),
+    delivery_latitude FLOAT,
+    delivery_longitude FLOAT,
     delivery_location_name VARCHAR(200),
 
     -- Paket bilgileri
     package_description VARCHAR(500) NOT NULL,
-    package_weight DECIMAL(8,2) COMMENT 'Paket ağırlığı (kg)',
+    package_weight FLOAT COMMENT 'Paket ağırlığı (kg)',
     package_count INT DEFAULT 1 COMMENT 'Paket adedi',
     package_value DECIMAL(10,2) COMMENT 'Paket değeri (sigorta için)',
 
