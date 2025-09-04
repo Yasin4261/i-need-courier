@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class CourierService {
-
+    
     private final CourierRepository courierRepository;
-
+    
     public CourierService(CourierRepository courierRepository) {
         this.courierRepository = courierRepository;
     }
