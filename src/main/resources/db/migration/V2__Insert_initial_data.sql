@@ -23,7 +23,7 @@ INSERT INTO coordinators (system_user_id, name, email, phone, employee_id, work_
 (2, 'Ahmet Yılmaz', 'ahmet.yilmaz@courier.com', '+905551234567', 'COORD001', 'SHIFT', '09:00:00', '18:00:00', 'ONLINE', 'Kadıköy, Üsküdar, Ataşehir', 15, true),
 (3, 'Ayşe Demir', 'ayse.demir@courier.com', '+905551234568', 'COORD002', 'SHIFT', '18:00:00', '03:00:00', 'OFFLINE', 'Beşiktaş, Şişli, Beyoğlu', 12, true);
 
--- Kuryeler (rating alanı kaldırıldı)
+-- Kuryeler
 INSERT INTO couriers (system_user_id, name, email, phone, license_number, vehicle_type, work_type, shift_start, shift_end, status, total_deliveries, vehicle_id, coordinator_id, is_available) VALUES
 (4, 'Ali Özkan', 'ali.ozkan@courier.com', '+905551111111', 'B123456', 'MOTORCYCLE', 'SHIFT', '09:00:00', '18:00:00', 'ONLINE', 150, 1, 1, true),
 (5, 'Fatma Çelik', 'fatma.celik@courier.com', '+905552222222', 'B234567', 'MOTORCYCLE', 'SHIFT', '09:00:00', '18:00:00', 'OFFLINE', 200, 2, 1, true),
@@ -32,22 +32,15 @@ INSERT INTO couriers (system_user_id, name, email, phone, license_number, vehicl
 -- İşletmeler (sipariş veren firmalar)
 INSERT INTO businesses (business_code, name, contact_person, phone, email, address, address_description, location_name, business_type, payment_terms, credit_limit, is_active, notes) VALUES
 ('BUS001', 'Köşe Restoran', 'Mehmet Bey', '+902161234567', 'info@koserestoran.com', 'Kadıköy Mah. Moda Cad. No:15 Kadıköy/İstanbul', 'Moda Sahili yanında, yeşil tabelalı bina, arka kapıdan giriş', 'Kadıköy Moda', 'Restaurant', 'POSTPAID', 5000.00, true, 'Hızlı teslimat gerektiren restoran'),
-
 ('BUS002', 'Pizza Palace Suadiye', 'Ayşe Hanım', '+902162345678', 'order@pizzapalace.com', 'Bağdat Cad. No:250 Suadiye/İstanbul', 'AVM karşısı, büyük pizza tabelası, araç park yeri var', 'Suadiye', 'Fast Food', 'PREPAID', 0.00, true, 'Günlük yoğun sipariş hacmi'),
-
 ('BUS003', 'Market Plus Ataşehir', 'Hasan Usta', '+902163456789', 'info@marketplus.com', 'Ataşehir Bulvarı No:100 Ataşehir/İstanbul', 'Metro çıkışı, 24 saat açık market, yükleme alanı mevcut', 'Ataşehir Merkez', 'Market', 'POSTPAID', 10000.00, true, '24 saat sipariş alıyor'),
-
 ('BUS004', 'Çiçek Dünyası Nişantaşı', 'Zeynep Hanım', '+902164567890', 'siparis@cicekdunyasi.com', 'Nişantaşı Cad. No:45 Şişli/İstanbul', 'Eski çiçekçiler çarşısı içinde, kırmızı tabela', 'Nişantaşı', 'Flower Shop', 'CASH_ON_DELIVERY', 2000.00, true, 'Özel günlerde yoğunluk artar'),
-
 ('BUS005', 'Eczane Sağlık Beyoğlu', 'Doktor Ahmet', '+902165678901', 'info@eczanesaglik.com', 'İstiklal Cad. No:123 Beyoğlu/İstanbul', 'Galatasaray Lisesi yanı, yeşil haç tabelası, 7/24 açık', 'Beyoğlu İstiklal', 'Pharmacy', 'POSTPAID', 3000.00, true, 'Acil ilaç siparişleri alır');
 
 -- Örnek siparişler
 INSERT INTO orders (order_number, status, priority, business_id, business_contact_person, business_phone, courier_id, coordinator_id, end_customer_name, end_customer_phone, pickup_address, pickup_address_description, pickup_contact_person, delivery_address, delivery_address_description, package_description, package_weight, package_count, payment_type, delivery_fee, collection_amount, courier_notes, business_notes, scheduled_pickup_time, estimated_delivery_time, order_date) VALUES
-
 ('ORD-2025080401', 'PENDING', 'NORMAL', 1, 'Mehmet Bey', '+902161234567', NULL, 1, 'Elif Yılmaz', '+905556666666', 'Kadıköy Mah. Moda Cad. No:15 Kadıköy/İstanbul', 'Moda Sahili yanında, yeşil tabelalı bina, arka kapıdan giriş', 'Mehmet Bey', 'Acıbadem Mah. Çeçen Sok. No:8 Kat:3 Üsküdar/İstanbul', 'Apartman zili çalışmıyor, telefon arayın, 3. kat daire 7', 'Pizza Margherita ve İçecek', 1.5, 1, 'CASH', 25.00, 45.50, 'Sıcak tutulmalı, ekstra soğuk içecek', 'Müşteri arayıp geldiğinde teslim et', '2025-08-04 19:30:00', '2025-08-04 20:15:00', '2025-08-04 19:00:00'),
-
 ('ORD-2025080402', 'ASSIGNED', 'HIGH', 2, 'Ayşe Hanım', '+902162345678', 1, 1, 'Ahmet Kaya', '+905557777777', 'Bağdat Cad. No:250 Suadiye/İstanbul', 'AVM karşısı, büyük pizza tabelası, araç park yeri var', 'Ayşe Hanım', 'Levent Mah. Büyükdere Cad. No:200 Şişli/İstanbul', 'İş merkezinde, güvenlik kaydı gerekli, 15. kat Garanti Bankası', 'Büyük boy karışık pizza ve salata', 2.0, 1, 'BUSINESS_ACCOUNT', 35.00, 0.00, 'İş merkezine giriş için kimlik gerekli', 'Öğle molasında teslim edilmeli', '2025-08-04 20:00:00', '2025-08-04 21:00:00', '2025-08-04 19:45:00'),
-
 ('ORD-2025080403', 'IN_TRANSIT', 'URGENT', 5, 'Doktor Ahmet', '+902165678901', 3, 2, 'Yaşlı Teyze', '+905558888888', 'İstiklal Cad. No:123 Beyoğlu/İstanbul', 'Galatasaray Lisesi yanı, yeşil haç tabelası, 7/24 açık', 'Doktor Ahmet', 'Fenerbahçe Mah. Bağdat Cad. No:300 Kat:1 Kadıköy/İstanbul', 'Kapıcı var, apartman no: 5, yaşlı teyze tek başına', 'Acil ilaç paketi - Kalp ilacı', 0.3, 1, 'CASH', 15.00, 125.00, 'Acil ilaç, hızlı teslimat gerekli, para tahsil edilecek', 'Kalp hastası için acil, gecikme olmasın', '2025-08-04 18:45:00', '2025-08-04 19:30:00', '2025-08-04 18:30:00');
 
 -- Sipariş takip kayıtları
