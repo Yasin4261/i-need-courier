@@ -1,6 +1,1 @@
-com/api/demo/service/CourierServiceTest.class
-com/api/demo/repository/CourierRepositoryTest.class
 com/api/demo/INeedCourierApplicationTests.class
-com/api/demo/service/CourierEventServiceTest.class
-com/api/demo/controller/CourierControllerTest.class
-com/api/demo/service/CourierQueueServiceTest.class
