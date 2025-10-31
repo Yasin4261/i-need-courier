@@ -152,3 +152,6 @@ application-dev.properties
 ## Screenshots (if applicable)
 <!-- Add screenshots to help explain your changes -->
 
+
+# Build artifacts (large files)
+target/
