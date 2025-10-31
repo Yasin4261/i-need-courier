@@ -2,6 +2,7 @@
 /home/yasin/Desktop/repos/i-need-courier/src/main/java/com/api/demo/config/SecurityConfig.java
 /home/yasin/Desktop/repos/i-need-courier/src/main/java/com/api/demo/controller/BusinessAuthController.java
 /home/yasin/Desktop/repos/i-need-courier/src/main/java/com/api/demo/controller/CourierAuthController.java
+/home/yasin/Desktop/repos/i-need-courier/src/main/java/com/api/demo/controller/RegistrationController.java
 /home/yasin/Desktop/repos/i-need-courier/src/main/java/com/api/demo/controller/UnifiedAuthController.java
 /home/yasin/Desktop/repos/i-need-courier/src/main/java/com/api/demo/dto/ApiResponse.java
 /home/yasin/Desktop/repos/i-need-courier/src/main/java/com/api/demo/dto/BusinessLoginRequest.java
