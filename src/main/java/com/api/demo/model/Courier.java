@@ -56,7 +56,8 @@ public class Courier {
         ONLINE,
         OFFLINE,
         BUSY,
-        SUSPENDED
+        SUSPENDED;
+    public static final CourierStatus AVAILABLE = ONLINE;
     }
 
     // Getters and Setters
