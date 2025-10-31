@@ -12,33 +12,27 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * JWT Token Provider for generating and validating JWT tokens.
- */
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret:mySecretKeyForJWTTokenGenerationAndValidation1234567890}")
+    @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration-hours:24}")
+    @Value("${jwt.expiration.hours}")
     private long jwtExpirationHours;
 
-    /**
-     * Generate JWT token for courier.
-     *
-     * @param courierId Courier ID
-     * @param email Courier email
-     * @return JWT token string
-     */
     public String generateToken(Long courierId, String email) {
+        return generateToken(courierId, email, "COURIER");
+    }
+
+    public String generateToken(Long userId, String email, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("courierId", courierId);
+        claims.put("userId", userId);
         claims.put("email", email);
+        claims.put("role", role);
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationHours * 60 * 60 * 1000);
-
         Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 
         return Jwts.builder()
@@ -50,49 +44,35 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    /**
-     * Get courier ID from JWT token.
-     *
-     * @param token JWT token
-     * @return Courier ID
-     */
     public Long getCourierIdFromToken(String token) {
         Claims claims = getAllClaimsFromToken(token);
-        return claims.get("courierId", Long.class);
+        return claims.get("userId", Long.class);
     }
 
-    /**
-     * Get email from JWT token.
-     *
-     * @param token JWT token
-     * @return Email address
-     */
+    public Long getUserIdFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        return claims.get("userId", Long.class);
+    }
+
+    public String getRoleFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        return claims.get("role", String.class);
+    }
+
     public String getEmailFromToken(String token) {
         Claims claims = getAllClaimsFromToken(token);
-        return claims.getSubject();
+        return claims.get("email", String.class);
     }
 
-    /**
-     * Validate JWT token.
-     *
-     * @param token JWT token
-     * @return true if valid, false otherwise
-     */
     public boolean validateToken(String token) {
         try {
-            Claims claims = getAllClaimsFromToken(token);
-            return !claims.getExpiration().before(new Date());
+            getAllClaimsFromToken(token);
+            return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    /**
-     * Get all claims from JWT token.
-     *
-     * @param token JWT token
-     * @return Claims
-     */
     private Claims getAllClaimsFromToken(String token) {
         Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
         return Jwts.parser()
