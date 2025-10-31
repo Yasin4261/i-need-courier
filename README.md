@@ -1,97 +1,212 @@
-# I Need Courier - B2B Courier Management System
+# 🚚 I Need Courier - Courier Management System
 
-A comprehensive B2B courier management system built with Spring Boot, designed for businesses to manage courier operations efficiently.
+> **Modern, Clean Layered Architecture ile geliştirilmiş kurye yönetim sistemi**
 
-## 🚀 Features
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.4-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-- **Courier Authentication**: JWT-based authentication system for couriers
-- **Simple Registration & Login**: Streamlined auth endpoints with standardized responses
-- **Email & Phone Validation**: Unique constraints and validation for user data
-- **Secure Password Handling**: BCrypt password encryption
-- **Database Schema Management**: Flyway migrations for consistent database state
-- **RESTful API**: Clean, documented API endpoints
-- **Containerized Deployment**: Docker and Docker Compose support
+---
 
-## 🏗️ Architecture
+## 📋 İçindekiler
 
-### Tech Stack
-- **Backend**: Spring Boot 3.5.4 with Java 21
-- **Database**: PostgreSQL with PostGIS extension
-- **Cache**: Redis (configured but disabled for simplicity)
-- **Message Queue**: Apache Kafka (configured but disabled for simplicity)
-- **Security**: Spring Security with JWT tokens
-- **Containerization**: Docker & Docker Compose
-- **Database Migrations**: Flyway
+- [Hızlı Başlangıç](#-hızlı-başlangıç)
+- [Özellikler](#-özellikler)
+- [Mimari](#️-mimari)
+- [Dokümantasyon](#-dokümantasyon)
+- [Kurulum](#-kurulum)
+- [API Kullanımı](#-api-kullanımı)
+- [Geliştirme](#-geliştirme)
+- [Katkıda Bulunma](#-katkıda-bulunma)
 
-### Current Implementation
-The system currently focuses on courier management with:
-1. **Courier Registration**: Simple registration with name, email, phone, and password
-2. **JWT Authentication**: Secure login with JWT token generation
-3. **Standardized API Responses**: Consistent response format with code, data, and message
-4. **Robust Error Handling**: Detailed error messages for debugging and user feedback
+---
 
-## 🗄️ Database Schema
+## 🚀 Hızlı Başlangıç
 
-### Current Tables
+### 3 Adımda Çalıştır
 
-#### Couriers Table
-- **id**: Primary key (bigserial)
-- **name**: Courier full name (varchar 100)
-- **email**: Unique email address (varchar 100)
-- **phone**: Unique phone number (varchar 20)
-- **password_hash**: Encrypted password (varchar 255)
-- **status**: User status enum (INACTIVE, ONLINE, OFFLINE, BUSY, SUSPENDED)
-- **created_at**: Registration timestamp
-- **updated_at**: Last update timestamp
-
-*Note: The database contains additional tables for businesses, orders, coordinators, etc., but the current API implementation focuses on courier authentication.*
-
-## 🚢 Deployment
-
-### Using Docker Compose
-
-1. **Clone the repository**
 ```bash
-git clone https://github.com/Yasin4261/i-need-courier.git
+# 1. Veritabanını başlat
+docker compose up -d postgres
+
+# 2. Projeyi derle
+./mvnw clean package -DskipTests
+
+# 3. Uygulamayı çalıştır
+./scripts/start.sh
+```
+
+**Uygulama hazır!** → http://localhost:8080
+
+### Test Et
+
+```bash
+# Sağlık kontrolü
+curl http://localhost:8080/actuator/health
+
+# Kurye kaydı
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John Doe","email":"john@test.com","phone":"+905551234567","password":"password123"}'
+
+# Giriş yap
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"courier1@test.com","password":"password123"}'
+```
+
+---
+
+## ✨ Özellikler
+
+### Mevcut Özellikler
+- ✅ **Kurye Kayıt Sistemi** - Yeni kuryelerin kayıt olması
+- ✅ **JWT Authentication** - Güvenli giriş ve token yönetimi
+- ✅ **Detaylı Hata Yönetimi** - Kullanıcı dostu hata mesajları
+- ✅ **Validation** - Kapsamlı input validasyonu
+- ✅ **API Dokümantasyonu** - Swagger/OpenAPI entegrasyonu
+- ✅ **Health Checks** - Actuator ile sistem sağlığı kontrolü
+- ✅ **Database Migrations** - Flyway ile versiyon kontrollü DB
+
+### Planlanan Özellikler
+- 🔜 **Sipariş Yönetimi** - Sipariş oluşturma ve takip
+- 🔜 **Gerçek Zamanlı Takip** - WebSocket ile canlı konum
+- 🔜 **İşletme Paneli** - İşletmeler için yönetim arayüzü
+- 🔜 **Bildirimler** - Push notification sistemi
+- 🔜 **Analytics Dashboard** - İstatistik ve raporlama
+
+---
+
+## 🏗️ Mimari
+
+### Clean Layered Architecture
+
+```
+┌─────────────────────────────────────┐
+│     Controller Layer                │  ← REST API Endpoints
+├─────────────────────────────────────┤
+│     Service Layer                   │  ← Business Logic
+├─────────────────────────────────────┤
+│     Repository Layer                │  ← Data Access
+├─────────────────────────────────────┤
+│     Model Layer                     │  ← Domain Entities
+└─────────────────────────────────────┘
+```
+
+### Proje Yapısı
+
+```
+i-need-courier/
+├── src/main/java/com/api/demo/
+│   ├── controller/      # REST Controllers
+│   ├── service/         # Business Logic
+│   ├── repository/      # Data Access
+│   ├── model/          # JPA Entities
+│   ├── dto/            # Data Transfer Objects
+│   ├── exception/      # Exception Handling
+│   ├── config/         # Configuration
+│   └── security/       # Security & JWT
+├── docs/               # 📚 Tüm Dokümantasyon
+│   ├── guides/         # Geliştirme rehberleri
+│   ├── api/            # API dokümantasyonu
+│   └── setup/          # Kurulum ve migration
+├── scripts/            # 🔧 Otomasyon scriptleri
+│   ├── start.sh
+│   ├── stop.sh
+│   └── setup-git.sh
+├── .github/            # GitHub templates & CI/CD
+└── migrations/         # Database migrations
+```
+
+**📖 Detaylı mimari açıklaması:** [Clean Layered Architecture Guide](docs/guides/CLEAN_LAYERED_ARCHITECTURE.md)
+
+---
+
+## 📚 Dokümantasyon
+
+### 🎯 Hızlı Başlangıç
+- **[Quick Start Guide](docs/guides/QUICKSTART.md)** - 5 dakikada başla
+- **[Migration Summary](docs/setup/MIGRATION_SUMMARY.md)** - Mimari geçiş özeti
+
+### 📖 Geliştirme Rehberleri
+- **[Clean Layered Architecture](docs/guides/CLEAN_LAYERED_ARCHITECTURE.md)** - Mimari detayları
+- **[Contributing Guide](docs/guides/CONTRIBUTING.md)** - Nasıl katkıda bulunulur
+- **[Git Workflow](docs/guides/GIT_WORKFLOW.md)** - Branch stratejisi ve commit kuralları
+
+### 🔧 Kurulum & Setup
+- **[GitHub Setup](docs/setup/GITHUB_SETUP_COMPLETE.md)** - GitHub yapılandırması
+- **[Migration Guide](docs/setup/MIGRATION_TO_CLEAN_ARCHITECTURE.md)** - Hexagonal'den Clean'e geçiş
+
+### 🌐 API Dokümantasyonu
+- **[API Overview](docs/api/API.md)** - Genel API bilgisi
+- **[Courier Auth API](docs/api/COURIER_AUTH_API.md)** - Authentication endpoints
+- **Swagger UI**: http://localhost:8080/swagger-ui/index.html (uygulama çalışırken)
+
+### 💾 Database
+- **[Database Design](docs/DATABASE_DESIGN.md)** - Veritabanı şeması
+- **[Database Guide](docs/DATABASE.md)** - Veritabanı kullanımı
+
+---
+
+## 🛠️ Kurulum
+
+### Gereksinimler
+
+- **Java 21+**
+- **Maven 3.9+**
+- **Docker & Docker Compose**
+- **PostgreSQL 16** (Docker ile gelir)
+
+### Detaylı Kurulum
+
+```bash
+# 1. Repository'yi klonla
+git clone https://github.com/YOUR_USERNAME/i-need-courier.git
 cd i-need-courier
+
+# 2. Veritabanını başlat
+docker compose up -d postgres
+
+# 3. Projeyi derle
+./mvnw clean install
+
+# 4. Uygulamayı çalıştır
+./scripts/start.sh
 ```
 
-2. **Start all services**
+### Environment Variables
+
 ```bash
-docker compose up --build -d
+# application.properties veya environment
+SERVER_PORT=8080
+DATABASE_URL=jdbc:postgresql://localhost:5432/courier_db
+DATABASE_USERNAME=courier_user
+DATABASE_PASSWORD=courier_pass
+JWT_SECRET=your-secret-key-change-in-production
+JWT_EXPIRATION_HOURS=24
 ```
 
-3. **Access the application**
-- Health Check: http://localhost:8081/actuator/health
-- API Documentation: http://localhost:8081/swagger-ui.html
+---
 
-### Services Overview
+## 🌐 API Kullanımı
 
-| Service | Port | Description |
-|---------|------|-------------|
-| Spring Boot App | 8081 | Main application server |
-| PostgreSQL | 5433 | Primary database |
-| Redis | 6380 | Cache (disabled) |
-| Kafka | 29092 | Message broker (disabled) |
+### Authentication Endpoints
 
-## 🔐 Authentication
-
-### API Endpoints
-
-#### Registration
+#### Kurye Kaydı
 ```bash
-POST /api/v1/simple-auth/register
+POST /api/v1/auth/register
 Content-Type: application/json
 
 {
   "name": "John Doe",
-  "email": "john@example.com", 
+  "email": "john@example.com",
   "phone": "+905551234567",
-  "password": "securepass123"
+  "password": "password123"
 }
 ```
 
-**Success Response (200):**
+**Başarılı Response (200)**:
 ```json
 {
   "code": 200,
@@ -105,27 +220,35 @@ Content-Type: application/json
 }
 ```
 
-**Error Response (409 - Email/Phone exists):**
+**Hata Response (400 - Validation)**:
 ```json
 {
-  "code": 409,
-  "data": null,
-  "message": "Courier already exists with email: john@example.com"
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Validation failed for one or more fields",
+  "path": "/api/v1/auth/register",
+  "timestamp": "2025-10-31T05:30:00",
+  "validationErrors": [
+    {
+      "field": "email",
+      "message": "Email must be valid"
+    }
+  ]
 }
 ```
 
-#### Login
+#### Giriş
 ```bash
-POST /api/v1/simple-auth/login
+POST /api/v1/auth/login
 Content-Type: application/json
 
 {
   "email": "john@example.com",
-  "password": "securepass123"
+  "password": "password123"
 }
 ```
 
-**Success Response (200):**
+**Başarılı Response (200)**:
 ```json
 {
   "code": 200,
@@ -140,120 +263,214 @@ Content-Type: application/json
 }
 ```
 
-### Using JWT Token
-Include the token in Authorization header for protected endpoints:
+### Test Kullanıcıları
+
 ```bash
-Authorization: Bearer eyJhbGciOiJIUzM4NCJ9...
+# Test User 1
+Email: courier1@test.com
+Password: password123
+
+# Test User 2
+Email: courier2@test.com
+Password: password123
+
+# Test User 3
+Email: courier3@test.com
+Password: password123
 ```
 
-## 🛠️ Development
+---
 
-### Prerequisites
-- Java 21+
-- Maven 3.6+
-- Docker & Docker Compose
+## 💻 Geliştirme
 
-### Local Development Setup
+### Development Workflow
 
-1. **Start Database and Services**
 ```bash
-docker compose up -d postgres redis kafka
+# 1. Feature branch oluştur
+git checkout -b feature/123-new-feature
+
+# 2. Değişikliklerini yap
+# ... kod yaz
+
+# 3. Test et
+./mvnw test
+
+# 4. Commit et (Conventional Commits)
+git commit -m "feat(orders): add order tracking endpoint"
+
+# 5. Push ve PR oluştur
+git push -u origin feature/123-new-feature
 ```
 
-2. **Run Application Locally**
+### Çalışma Komutları
+
 ```bash
-./mvnw spring-boot:run
+# Uygulamayı başlat
+./scripts/start.sh
+
+# Uygulamayı durdur
+./scripts/stop.sh
+
+# Build
+./mvnw clean install
+
+# Testleri çalıştır
+./mvnw test
+
+# Sadece derle
+./mvnw compile
+
+# Package oluştur
+./mvnw package -DskipTests
+
+# Logları görüntüle
+tail -f logs/app.log
 ```
 
-### Database Migrations
+### Code Style
 
-The project uses Flyway for database migrations:
-- `V1__Create_initial_tables.sql`: Creates all database tables
-- `V2__Insert_initial_data.sql`: Loads sample data
-- `V3__Add_location_columns_to_businesses.sql`: Location updates
-- `V4__Create_couriers_table.sql`: Courier table (skipped if exists)
-- `V5__Add_password_hash_to_couriers.sql`: Adds password_hash column
-- `V6__Update_user_status_enum.sql`: Updates user status enum values
+- **Format**: Google Java Style Guide
+- **Line Length**: 120 characters
+- **Indentation**: 4 spaces
+- **Naming**: camelCase (methods/variables), PascalCase (classes)
 
-Migrations run automatically on application startup.
+---
 
-## 📡 API Endpoints
+## 🤝 Katkıda Bulunma
 
-### Authentication Endpoints
-- `POST /api/v1/simple-auth/register` - Register new courier
-- `POST /api/v1/simple-auth/login` - Login and get JWT token
+Katkılarınızı bekliyoruz! 
 
-### Legacy Endpoints (Available but Complex)
-- `POST /api/v1/courier/auth/register` - Legacy registration endpoint
-- `POST /api/v1/courier/auth/login` - Legacy login endpoint
+### Katkı Süreci
 
-### Health & Monitoring
-- `GET /actuator/health` - Application health status
-- `GET /actuator/info` - Application information  
-- `GET /actuator/metrics` - Application metrics
-- `GET /swagger-ui.html` - API Documentation
+1. **Fork** edin
+2. **Feature branch** oluşturun (`git checkout -b feature/amazing-feature`)
+3. **Commit** edin (`git commit -m 'feat: add amazing feature'`)
+4. **Push** edin (`git push origin feature/amazing-feature`)
+5. **Pull Request** açın
 
-## 📋 Validation Rules
+### Kurallar
 
-### Registration Validation
-- **Name**: 2-100 characters, required
-- **Email**: Valid email format, unique, required
-- **Phone**: Valid phone format, unique, required  
-- **Password**: 6-20 characters, required
+- ✅ [Contributing Guide](docs/guides/CONTRIBUTING.md) oku
+- ✅ [Git Workflow](docs/guides/GIT_WORKFLOW.md) takip et
+- ✅ Conventional Commits kullan
+- ✅ Test yaz
+- ✅ Code review bekle
 
-### Response Format
-All API responses follow this standard format:
-```json
-{
-  "code": 200,
-  "data": { ... },
-  "message": "Success message"
-}
+---
+
+## 🧪 Testing
+
+### Unit Tests
+```bash
+./mvnw test
 ```
 
-## 🚨 Error Handling
+### Integration Tests
+```bash
+./mvnw verify
+```
 
-The system includes comprehensive error handling:
-- **Validation Errors**: Field-level validation with detailed messages
-- **Duplicate Data**: Specific errors for email/phone conflicts
-- **Authentication Errors**: Invalid credentials handling
-- **Database Errors**: Graceful handling of database issues
-- **Generic Errors**: Fallback error handling with detailed logging
+### Test Coverage
+```bash
+./mvnw jacoco:report
+# Rapor: target/site/jacoco/index.html
+```
 
-## 🔧 Configuration
+---
 
-### Application Properties
-- **JWT Secret**: Configurable via `jwt.secret`
-- **JWT Expiration**: Configurable via `jwt.expiration-hours` (default: 24h)
-- **Database**: PostgreSQL connection settings
-- **Logging**: Debug logging enabled for development
+## 📊 Teknoloji Stack
 
-## 🔮 Future Enhancements
+| Kategori | Teknoloji |
+|----------|-----------|
+| **Backend** | Spring Boot 3.5.4 |
+| **Language** | Java 21 |
+| **Database** | PostgreSQL 16 + PostGIS |
+| **ORM** | Spring Data JPA / Hibernate |
+| **Security** | Spring Security + JWT |
+| **Migration** | Flyway |
+| **Validation** | Jakarta Validation |
+| **API Docs** | SpringDoc OpenAPI |
+| **Build Tool** | Maven |
+| **Container** | Docker & Docker Compose |
 
-- [ ] Order management endpoints
-- [ ] Coordinator management
-- [ ] Business management  
-- [ ] Real-time order tracking
-- [ ] Mobile application for couriers
-- [ ] Advanced analytics and reporting
-- [ ] Integration with mapping services
-- [ ] Automated dispatch algorithms
+---
 
-## 🤝 Contributing
+## 📈 Roadmap
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### v1.0.0 (Current) ✅
+- [x] Clean Layered Architecture
+- [x] Courier authentication
+- [x] Error handling
+- [x] Documentation
+- [x] CI/CD setup
 
-## 📄 License
+### v1.1.0 (Next)
+- [ ] Order management
+- [ ] Order tracking
+- [ ] Courier assignment
+- [ ] Real-time updates
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### v1.2.0
+- [ ] Business dashboard
+- [ ] Analytics
+- [ ] Notifications
+- [ ] Mobile API
 
-## 🙋‍♂️ Support
+### v2.0.0
+- [ ] Microservices architecture
+- [ ] Mobile app
+- [ ] Advanced features
+- [ ] Scale optimization
 
-For support and questions:
-- Create an issue in the GitHub repository
-- Check the API documentation at `/swagger-ui.html`
-- Review the standardized API responses
+---
+
+## 🐛 Sorun Bildirme
+
+Bir sorun mu buldunuz? [Issue açın](https://github.com/YOUR_USERNAME/i-need-courier/issues/new/choose)
+
+Templates:
+- 🐛 [Bug Report](.github/ISSUE_TEMPLATE/bug_report.md)
+- ✨ [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md)
+
+---
+
+## 📞 İletişim
+
+- **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/i-need-courier/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/YOUR_USERNAME/i-need-courier/discussions)
+- **Documentation**: [docs/](docs/)
+
+---
+
+## 📄 Lisans
+
+Bu proje [MIT](LICENSE) lisansı altında lisanslanmıştır.
+
+---
+
+## 🙏 Teşekkürler
+
+- Spring Boot ekibine
+- PostgreSQL topluluğuna
+- Açık kaynak topluluğuna
+
+---
+
+## 🔗 Bağlantılar
+
+- 📚 [Tüm Dokümantasyon](docs/)
+- 🚀 [Quick Start](docs/guides/QUICKSTART.md)
+- 🏗️ [Architecture Guide](docs/guides/CLEAN_LAYERED_ARCHITECTURE.md)
+- 🤝 [Contributing](docs/guides/CONTRIBUTING.md)
+- 🌿 [Git Workflow](docs/guides/GIT_WORKFLOW.md)
+
+---
+
+<div align="center">
+
+**⭐ Projeyi beğendiyseniz yıldız vermeyi unutmayın!**
+
+Made with ❤️ using Clean Architecture
+
+</div>
+
