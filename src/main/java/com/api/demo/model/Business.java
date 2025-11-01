@@ -38,10 +38,10 @@ public class Business {
     @Column(name = "address_description", columnDefinition = "TEXT")
     private String addressDescription;
 
-    @Column(precision = 10, scale = 8)
+    @Column
     private Double latitude;
 
-    @Column(precision = 11, scale = 8)
+    @Column
     private Double longitude;
 
     @Column(name = "location_name", length = 200)
@@ -54,7 +54,7 @@ public class Business {
     @Column(name = "payment_terms")
     private PaymentTerms paymentTerms = PaymentTerms.POSTPAID;
 
-    @Column(name = "credit_limit", precision = 10, scale = 2)
+    @Column
     private Double creditLimit = 0.0;
 
     @Column(name = "is_active")
