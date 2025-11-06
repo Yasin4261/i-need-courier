@@ -61,7 +61,7 @@ public class Business {
     private Boolean isActive = true;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "business_status")
+    @Column(name = "status")
     private BusinessStatus status = BusinessStatus.PENDING;
 
     @Column(name = "email_verified")

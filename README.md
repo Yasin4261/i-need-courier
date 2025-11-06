@@ -2,10 +2,21 @@
 
 > **Modern, Clean Layered Architecture ile geliştirilmiş kurye yönetim sistemi**
 
+[![Version](https://img.shields.io/badge/Version-1.1.0-blue.svg)](VERSION.md)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.4-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.4-blue.svg)](https://www.postgresql.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Build](https://img.shields.io/badge/Build-Passing-success.svg)](https://github.com)
+
+## 🎉 What's New in v1.1.0
+
+✅ **Unified Authentication** - Single login endpoint for all user types  
+✅ **Auto User Detection** - System automatically identifies Courier/Business users  
+✅ **JWT Role-based Auth** - Enhanced security with role management  
+✅ **Self Registration** - Courier and Business can register themselves  
+
+[📋 See Full Changelog](CHANGELOG.md) | [📚 Version History](VERSION.md)
 
 ---
 
@@ -43,38 +54,69 @@ docker compose up -d postgres
 
 ```bash
 # Sağlık kontrolü
-curl http://localhost:8080/actuator/health
+curl http://localhost:8081/actuator/health
 
 # Kurye kaydı
-curl -X POST http://localhost:8080/api/v1/auth/register \
+curl -X POST http://localhost:8081/api/v1/auth/register/courier \
   -H "Content-Type: application/json" \
-  -d '{"name":"John Doe","email":"john@test.com","phone":"+905551234567","password":"password123"}'
+  -d '{
+    "name": "Ahmet Yılmaz",
+    "email": "ahmet@courier.com",
+    "password": "password123",
+    "phone": "+905551234567",
+    "vehicleType": "MOTORCYCLE"
+  }'
 
-# Giriş yap
-curl -X POST http://localhost:8080/api/v1/auth/login \
+# İşletme kaydı
+curl -X POST http://localhost:8081/api/v1/auth/register/business \
   -H "Content-Type: application/json" \
-  -d '{"email":"courier1@test.com","password":"password123"}'
+  -d '{
+    "name": "Pizza House",
+    "email": "info@pizzahouse.com",
+    "password": "password123",
+    "phone": "+905559999999",
+    "address": "Istanbul",
+    "contactPerson": "Mehmet Öz",
+    "businessType": "Restaurant"
+  }'
+
+# Unified Login (Courier veya Business)
+curl -X POST http://localhost:8081/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "ahmet@courier.com",
+    "password": "password123"
+  }'
 ```
+
+**📖 Detaylı test rehberi:** [TEST_LOGIN_GUIDE.md](docs/guides/TEST_LOGIN_GUIDE.md)
 
 ---
 
 ## ✨ Özellikler
 
-### Mevcut Özellikler
-- ✅ **Kurye Kayıt Sistemi** - Yeni kuryelerin kayıt olması
-- ✅ **JWT Authentication** - Güvenli giriş ve token yönetimi
+### 🎯 v1.1.0 Özellikleri
+- ✅ **Unified Authentication** - Tek endpoint ile tüm kullanıcı tipleri giriş
+- ✅ **Courier Self-Registration** - Kuryeler kendilerini kaydedebilir
+- ✅ **Business Self-Registration** - İşletmeler kendilerini kaydedebilir
+- ✅ **Auto User Detection** - Otomatik kullanıcı tipi tespiti
+- ✅ **JWT Role-based Auth** - Role bazlı yetkilendirme (COURIER/BUSINESS)
+- ✅ **Status Management** - Kullanıcı durum kontrolü (ACTIVE/PENDING/ONLINE)
+- ✅ **BCrypt Password** - Güvenli şifre hashleme
 - ✅ **Detaylı Hata Yönetimi** - Kullanıcı dostu hata mesajları
-- ✅ **Validation** - Kapsamlı input validasyonu
-- ✅ **API Dokümantasyonu** - Swagger/OpenAPI entegrasyonu
-- ✅ **Health Checks** - Actuator ile sistem sağlığı kontrolü
+- ✅ **Input Validation** - Kapsamlı input validasyonu
+- ✅ **API Dokümantasyonu** - Swagger/OpenAPI 3.0
+- ✅ **Health Checks** - Actuator ile sistem sağlığı
 - ✅ **Database Migrations** - Flyway ile versiyon kontrollü DB
 
-### Planlanan Özellikler
+### 🔜 Planlanan Özellikler (v1.2.0)
+- 🔜 **Admin Panel** - Yönetici kullanıcı yönetimi
 - 🔜 **Sipariş Yönetimi** - Sipariş oluşturma ve takip
 - 🔜 **Gerçek Zamanlı Takip** - WebSocket ile canlı konum
-- 🔜 **İşletme Paneli** - İşletmeler için yönetim arayüzü
-- 🔜 **Bildirimler** - Push notification sistemi
+- 🔜 **Push Notifications** - Anlık bildirim sistemi
 - 🔜 **Analytics Dashboard** - İstatistik ve raporlama
+- 🔜 **Email Verification** - Email doğrulama sistemi
+- 🔜 **SMS Notifications** - SMS bildirimleri
 
 ---
 
@@ -125,27 +167,32 @@ i-need-courier/
 
 ## 📚 Dokümantasyon
 
+**📑 [Dokümantasyon Ana Sayfası](docs/INDEX.md)** - Tüm dökümantasyona buradan ulaşabilirsiniz
+
 ### 🎯 Hızlı Başlangıç
 - **[Quick Start Guide](docs/guides/QUICKSTART.md)** - 5 dakikada başla
-- **[Migration Summary](docs/setup/MIGRATION_SUMMARY.md)** - Mimari geçiş özeti
+- **[Test Login Guide](docs/guides/TEST_LOGIN_GUIDE.md)** - Authentication testi
+- **[Test Results](docs/guides/TEST_RESULTS.md)** - Test örnekleri ve sonuçları
 
 ### 📖 Geliştirme Rehberleri
 - **[Clean Layered Architecture](docs/guides/CLEAN_LAYERED_ARCHITECTURE.md)** - Mimari detayları
 - **[Contributing Guide](docs/guides/CONTRIBUTING.md)** - Nasıl katkıda bulunulur
 - **[Git Workflow](docs/guides/GIT_WORKFLOW.md)** - Branch stratejisi ve commit kuralları
 
-### 🔧 Kurulum & Setup
-- **[GitHub Setup](docs/setup/GITHUB_SETUP_COMPLETE.md)** - GitHub yapılandırması
-- **[Migration Guide](docs/setup/MIGRATION_TO_CLEAN_ARCHITECTURE.md)** - Hexagonal'den Clean'e geçiş
-
-### 🌐 API Dokümantasyonu
+### 🔐 API & Authentication
+- **[Unified Auth API](docs/api/UNIFIED_AUTH_API.md)** - Birleşik giriş sistemi
 - **[API Overview](docs/api/API.md)** - Genel API bilgisi
-- **[Courier Auth API](docs/api/COURIER_AUTH_API.md)** - Authentication endpoints
-- **Swagger UI**: http://localhost:8080/swagger-ui/index.html (uygulama çalışırken)
+- **[Auth Quick Reference](docs/api/AUTH_QUICK_REFERENCE.md)** - Hızlı API referansı
+- **Swagger UI**: http://localhost:8081/swagger-ui.html (uygulama çalışırken)
 
 ### 💾 Database
-- **[Database Design](docs/DATABASE_DESIGN.md)** - Veritabanı şeması
+- **[Database Design](docs/DATABASE_DESIGN.md)** - Veritabanı şeması ve tasarımı
 - **[Database Guide](docs/DATABASE.md)** - Veritabanı kullanımı
+- **[Database for Backend](docs/DATABASE_FOR_BACKEND.md)** - Backend entegrasyonu
+
+### 📦 Version & Changes
+- **[Version History](VERSION.md)** - Tüm sürüm geçmişi ve roadmap
+- **[Changelog](CHANGELOG.md)** - Detaylı değişiklik listesi
 
 ---
 

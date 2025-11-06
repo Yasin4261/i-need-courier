@@ -27,7 +27,7 @@ public class Courier {
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "user_status")
+    @Column(nullable = false, length = 20)
     private CourierStatus status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
