@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle invalid credentials' exception.
+     * Handle invalid credentials exception.
      */
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleInvalidCredentials(
@@ -89,6 +89,72 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
+                .body(errorResponse);
+    }
+
+    /**
+     * Handle order not found exception.
+     */
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleOrderNotFound(
+            OrderNotFoundException ex,
+            HttpServletRequest request) {
+
+        logger.warn("Order not found: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                404,
+                "Not Found",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(errorResponse);
+    }
+
+    /**
+     * Handle unauthorized access exception.
+     */
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedAccess(
+            UnauthorizedAccessException ex,
+            HttpServletRequest request) {
+
+        logger.warn("Unauthorized access: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                403,
+                "Forbidden",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(errorResponse);
+    }
+
+    /**
+     * Handle invalid order operation exception.
+     */
+    @ExceptionHandler(InvalidOrderOperationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidOrderOperation(
+            InvalidOrderOperationException ex,
+            HttpServletRequest request) {
+
+        logger.warn("Invalid order operation: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                400,
+                "Bad Request",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(errorResponse);
     }
 

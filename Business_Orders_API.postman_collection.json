@@ -1,0 +1,459 @@
+{
+  "info": {
+    "name": "I Need Courier - Business Orders API",
+    "description": "Complete Business Order Management API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "business-orders-v1.1.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/actuator/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["actuator", "health"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "1. Business Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set(\"token\", jsonData.data.token);",
+              "pm.environment.set(\"businessId\", jsonData.data.userId);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"yeni@pizza.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2. Create Order - Basic",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set(\"orderId\", jsonData.data.orderId);",
+              "pm.environment.set(\"orderNumber\", jsonData.data.orderNumber);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pickupAddress\": \"Kadıköy Moda Caddesi No:123, Istanbul\",\n  \"deliveryAddress\": \"Beşiktaş Barbaros Bulvarı No:45, Istanbul\",\n  \"endCustomerName\": \"Ahmet Yılmaz\",\n  \"endCustomerPhone\": \"+905551234567\",\n  \"priority\": \"NORMAL\",\n  \"paymentType\": \"CASH\",\n  \"deliveryFee\": 35.50\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. Create Order - Detailed",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pickupAddress\": \"Kadıköy Moda Caddesi No:123, Istanbul\",\n  \"pickupAddressDescription\": \"Köşe bina, kırmızı kapı\",\n  \"pickupContactPerson\": \"Ali Veli\",\n  \"deliveryAddress\": \"Beşiktaş Barbaros Bulvarı No:45, Istanbul\",\n  \"deliveryAddressDescription\": \"Ofis binası 3. kat\",\n  \"endCustomerName\": \"Ahmet Yılmaz\",\n  \"endCustomerPhone\": \"+905551234567\",\n  \"packageDescription\": \"2x Pizza Margherita, 1x Coca Cola\",\n  \"packageWeight\": 1.5,\n  \"packageCount\": 3,\n  \"priority\": \"NORMAL\",\n  \"paymentType\": \"CASH\",\n  \"deliveryFee\": 35.50,\n  \"collectionAmount\": 0,\n  \"businessNotes\": \"Sıcak tutulmalı, 30 dakikada teslim\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4. Create Order - Urgent",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pickupAddress\": \"Kadıköy, Istanbul\",\n  \"deliveryAddress\": \"Beşiktaş, Istanbul\",\n  \"endCustomerName\": \"Mehmet Öz\",\n  \"endCustomerPhone\": \"+905559876543\",\n  \"priority\": \"URGENT\",\n  \"paymentType\": \"CREDIT_CARD\",\n  \"deliveryFee\": 50.00,\n  \"businessNotes\": \"ACİL TESLİMAT!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5. Create Order - Cash on Delivery",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pickupAddress\": \"Kadıköy, Istanbul\",\n  \"deliveryAddress\": \"Şişli, Istanbul\",\n  \"endCustomerName\": \"Ayşe Demir\",\n  \"endCustomerPhone\": \"+905551112233\",\n  \"priority\": \"NORMAL\",\n  \"paymentType\": \"CASH_ON_DELIVERY\",\n  \"deliveryFee\": 25.00,\n  \"collectionAmount\": 150.00,\n  \"businessNotes\": \"Müşteriden 150 TL tahsil edilecek\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6. Get All Orders",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7. Get Orders - Filter PENDING",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders?status=PENDING",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders"],
+          "query": [
+            {
+              "key": "status",
+              "value": "PENDING"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8. Get Orders - Filter ASSIGNED",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders?status=ASSIGNED",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders"],
+          "query": [
+            {
+              "key": "status",
+              "value": "ASSIGNED"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "9. Get Order by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders/{{orderId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10. Update Order - Description",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"packageDescription\": \"3x Pizza Margherita (GÜNCELLEME)\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders/{{orderId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "11. Update Order - Address",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"deliveryAddress\": \"Taksim Meydanı No:1, Istanbul\",\n  \"deliveryAddressDescription\": \"Meydan girişi\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders/{{orderId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "12. Update Order - Priority & Notes",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"priority\": \"HIGH\",\n  \"businessNotes\": \"ACİL TESLİMAT GEREKLİ!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders/{{orderId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "13. Update Order - Multiple Fields",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"packageDescription\": \"4x Pizza + 2x İçecek\",\n  \"packageWeight\": 2.5,\n  \"packageCount\": 6,\n  \"deliveryFee\": 45.00,\n  \"businessNotes\": \"Paket içeriği değişti\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders/{{orderId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "14. Cancel Order - No Reason",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders/{{orderId}}/cancel",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders", "{{orderId}}", "cancel"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "15. Cancel Order - With Reason",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders/{{orderId}}/cancel?reason=Müşteri vazgeçti",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders", "{{orderId}}", "cancel"],
+          "query": [
+            {
+              "key": "reason",
+              "value": "Müşteri vazgeçti"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "16. Delete Order",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders/{{orderId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders", "{{orderId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "17. Get Statistics",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/business/orders/statistics",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "business", "orders", "statistics"]
+        }
+      },
+      "response": []
+    }
+  ]
+}
+
