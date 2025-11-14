@@ -30,9 +30,15 @@ Welcome to the **I Need Courier** documentation! This guide will help you naviga
 - [Test Results](guides/TEST_RESULTS.md) - Test examples and results
 
 ### 🗄️ Database
-- [Database Design](DATABASE.md) - Overall database architecture
+- [Database Design](DATABASE_DESIGN.md) - Overall database architecture
+- [Database Schema](DATABASE.md) - Detailed table schemas
 - [Database for Backend](DATABASE_FOR_BACKEND.md) - Backend-specific DB info
 - [Database Graph](db_graph.png) - Visual schema diagram
+
+### 📅 Shift Management (NEW)
+- [Shift Management Guide](guides/SHIFT_MANAGEMENT_GUIDE.md) - Complete shift system guide
+- [Shift System Changelog](SHIFT_SYSTEM_CHANGELOG.md) - What's new in shift system
+- [Database Design](DATABASE_DESIGN.md#3-vardiya-yönetim-sistemi) - Shift tables and logic
 
 ### 🏗️ Architecture
 - [Clean Layered Architecture](guides/CLEAN_LAYERED_ARCHITECTURE.md) - Current architecture
@@ -68,7 +74,13 @@ Welcome to the **I Need Courier** documentation! This guide will help you naviga
 1. [API Documentation](api/API.md)
 2. [Unified Auth API](api/UNIFIED_AUTH_API.md)
 3. [Auth Quick Reference](api/AUTH_QUICK_REFERENCE.md)
-4. [Test Examples](guides/TEST_RESULTS.md)
+4. [Shift Management Guide](guides/SHIFT_MANAGEMENT_GUIDE.md) - Shift API endpoints
+5. [Test Examples](guides/TEST_RESULTS.md)
+
+### For Courier Mobile App Developers
+1. [Shift Management Guide](guides/SHIFT_MANAGEMENT_GUIDE.md) - Complete shift workflow
+2. [Unified Auth API](api/UNIFIED_AUTH_API.md) - Login/Register
+3. [Auth Quick Reference](api/AUTH_QUICK_REFERENCE.md) - Quick reference
 
 ### For DevOps Engineers
 1. [Deployment Guide](DEPLOYMENT.md)
@@ -82,9 +94,16 @@ Welcome to the **I Need Courier** documentation! This guide will help you naviga
 
 ---
 
-## 📊 Current Version: v1.1.0
+## 📊 Current Version: v1.2.0
 
-### What's New in v1.1.0
+### What's New in v1.2.0 (Latest)
+- ✅ **Shift Management System** - Full shift reservation and check-in/out
+- ✅ **FIFO Order Assignment** - Queue-based fair distribution
+- ✅ **Shift Templates** - Reusable shift schedules
+- ✅ **on_duty_since Tracking** - Automatic queue management
+- ✅ **REST API for Shifts** - Complete courier shift endpoints
+
+### Previous Version (v1.1.0)
 - ✅ Unified Authentication System
 - ✅ Auto User Type Detection
 - ✅ Courier Self-Registration

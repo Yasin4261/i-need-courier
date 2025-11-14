@@ -1,5 +1,8 @@
 package com.api.demo.config;
 
+import com.api.demo.security.JwtAccessDeniedHandler;
+import com.api.demo.security.JwtAuthenticationEntryPoint;
+import com.api.demo.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -23,6 +27,18 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                          JwtAccessDeniedHandler jwtAccessDeniedHandler) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
+    }
+
     /**
      * Configure HTTP security.
      */
@@ -34,11 +50,14 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/business/**").permitAll()  // TODO: Add JWT authentication
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/api/v1/courier/shifts/**").authenticated()
+                .requestMatchers("/api/v1/business/**").authenticated()
                 .anyRequest().authenticated()
-            );
+            )
+            // Add JWT filter before UsernamePasswordAuthenticationFilter
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -67,4 +86,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-

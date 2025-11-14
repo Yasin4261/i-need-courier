@@ -36,6 +36,13 @@ public class Courier {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    /**
+     * Sıra tabanlı atama için - kurye vardiyaya giriş yaptığında set edilir
+     * Kurye check-in yaptığında bu alan doldurulur, check-out'ta null yapılır
+     */
+    @Column(name = "on_duty_since")
+    private LocalDateTime onDutySince;
+
     // Constructors
     public Courier() {
     }
@@ -124,6 +131,14 @@ public class Courier {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getOnDutySince() {
+        return onDutySince;
+    }
+
+    public void setOnDutySince(LocalDateTime onDutySince) {
+        this.onDutySince = onDutySince;
     }
 
     @PrePersist
