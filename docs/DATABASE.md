@@ -115,10 +115,76 @@ Delivery personnel who execute orders.
 | current_longitude | DECIMAL(11,8) | | Current GPS longitude |
 | current_location_name | VARCHAR(200) | | Current location name |
 | total_deliveries | INT | DEFAULT 0 | Total completed deliveries |
+| on_duty_since | TIMESTAMP WITH TIME ZONE | | Queue-based assignment key (set on check-in) |
 | vehicle_id | BIGINT | FK → vehicles.id | Assigned vehicle |
 | coordinator_id | BIGINT | FK → coordinators.id | Assigned coordinator |
 | created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Creation time |
 | updated_at | DATETIME | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Last update time |
+
+**Note:** `on_duty_since` is used for FIFO (First-In, First-Out) order assignment. Set when courier checks in, cleared on check-out.
+
+### shifts
+Courier shift reservations with check-in/check-out management.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| shift_id | BIGINT | PRIMARY KEY, AUTO_INCREMENT | Unique identifier |
+| courier_id | BIGINT | NOT NULL, FK → couriers.id | Assigned courier |
+| start_time | TIMESTAMP WITH TIME ZONE | NOT NULL | Planned shift start time |
+| end_time | TIMESTAMP WITH TIME ZONE | NOT NULL | Planned shift end time |
+| shift_role | ENUM | NOT NULL, DEFAULT 'COURIER' | COURIER, CAPTAIN |
+| status | ENUM | NOT NULL, DEFAULT 'RESERVED' | RESERVED, CHECKED_IN, CHECKED_OUT, CANCELLED, NO_SHOW |
+| check_in_time | TIMESTAMP WITH TIME ZONE | | Actual check-in timestamp |
+| check_out_time | TIMESTAMP WITH TIME ZONE | | Actual check-out timestamp |
+| notes | TEXT | | Shift notes and comments |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Creation time |
+| updated_at | DATETIME | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Last update time |
+
+**Shift Status Enum:**
+- `RESERVED`: Shift is reserved but courier hasn't checked in yet
+- `CHECKED_IN`: Courier has checked in and is actively working
+- `CHECKED_OUT`: Courier has checked out, shift completed
+- `CANCELLED`: Reservation cancelled by courier (min 2 hours before start)
+- `NO_SHOW`: Courier didn't check in for reserved shift
+
+**Constraints:**
+- Check-in time must be within 30 minutes before start_time
+- Check-out time must be after check-in time
+- Maximum shift duration: 24 hours
+- No overlapping shifts for the same courier
+
+**Indexes:**
+- `idx_shifts_courier (courier_id)`
+- `idx_shifts_status (status)`
+- `idx_shifts_date_range (start_time, end_time)`
+- `idx_shifts_courier_status (courier_id, status)`
+
+### shift_templates
+Reusable shift time templates for easy reservation.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| template_id | BIGINT | PRIMARY KEY, AUTO_INCREMENT | Unique identifier |
+| name | VARCHAR(100) | NOT NULL | Template name (e.g., "Morning Shift") |
+| description | TEXT | | Template description |
+| start_time | TIME | NOT NULL | Start time of day |
+| end_time | TIME | NOT NULL | End time of day |
+| default_role | ENUM | DEFAULT 'COURIER' | Default role for this shift |
+| max_couriers | INT | DEFAULT 10 | Maximum couriers per shift |
+| is_active | BOOLEAN | DEFAULT TRUE | Template active status |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Creation time |
+| updated_at | DATETIME | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Last update time |
+
+**Default Templates:**
+- Morning Shift: 09:00 - 17:00 (15 couriers)
+- Evening Shift: 14:00 - 22:00 (12 couriers)
+- Night Shift: 18:00 - 02:00 (8 couriers, restaurant deliveries)
+- Full Day Shift: 08:00 - 20:00 (5 couriers, joker mode)
+- Captain Morning: 08:00 - 16:00 (3 team leaders)
+
+**Indexes:**
+- `idx_shift_templates_active (is_active)`
+- `idx_shift_templates_times (start_time, end_time)`
 
 ### orders
 Delivery orders from businesses to end customers.
@@ -195,10 +261,84 @@ Order status change history and tracking.
 - **system_users** → **coordinators** (1:1)
 - **system_users** → **couriers** (1:1)
 - **coordinators** → **couriers** (1:N)
+- **couriers** → **shifts** (1:N) - A courier can have multiple shifts
+- **shift_templates** → **shifts** (logical reference) - Templates used to create shifts
 - **businesses** → **orders** (1:N)
 - **couriers** → **orders** (1:N)
 - **vehicles** → **couriers** (1:1)
 - **orders** → **order_tracking** (1:N)
+
+## Shift Management System
+
+### Shift Workflow
+
+```
+1. RESERVATION (RESERVED)
+   ↓ Courier reserves a shift using a template for a future date
+   
+2. CHECK-IN (CHECKED_IN)
+   ↓ Courier checks in when shift time arrives (up to 30 min early)
+   ↓ System sets couriers.on_duty_since = CURRENT_TIMESTAMP
+   ↓ Courier enters FIFO queue for order assignment
+   
+3. ACTIVE WORK
+   ↓ Courier receives and delivers orders based on FIFO
+   
+4. CHECK-OUT (CHECKED_OUT)
+   ↓ Courier checks out at shift end (can be early or late)
+   ↓ System clears couriers.on_duty_since = NULL
+   ↓ Courier exits FIFO queue
+```
+
+### Business Rules
+
+**Reservation Rules:**
+- Cannot reserve shifts for past dates
+- No overlapping shifts for the same courier
+- Can reserve multiple non-overlapping shifts per day
+- Cancellation allowed until 2 hours before start
+
+**Check-In Rules:**
+- Can check in 30 minutes before scheduled start
+- Only RESERVED shifts can be checked in
+- Location data (lat/lon) optionally captured
+- Automatically updates courier status to ONLINE
+
+**Check-Out Rules:**
+- Only CHECKED_IN shifts can be checked out
+- Can check out anytime (early or late allowed)
+- Automatically updates courier status to OFFLINE
+- Clears on_duty_since for queue management
+
+### FIFO Order Assignment
+
+The system implements **First-In, First-Out** logic for fair order distribution:
+
+```sql
+-- Find next courier in queue
+SELECT id, name, 
+       EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - on_duty_since))/3600 as hours_working
+FROM couriers
+WHERE status = 'ONLINE' 
+  AND on_duty_since IS NOT NULL
+ORDER BY on_duty_since ASC
+LIMIT 1;
+```
+
+**Queue Priority:**
+- Couriers sorted by `on_duty_since` ascending (earliest first)
+- Longest-working courier gets the next order
+- Fair distribution across active couriers
+- Automatic queue management via check-in/check-out
+
+**Example:**
+```
+Courier A: on_duty_since = 08:00 (4 hours) → Priority 1
+Courier B: on_duty_since = 09:30 (2.5 hours) → Priority 2
+Courier C: on_duty_since = 10:15 (1.75 hours) → Priority 3
+
+Next order → Assigned to Courier A
+```
 
 ## Indexes and Performance
 
@@ -207,8 +347,15 @@ Order status change history and tracking.
 - **Status filtering**: Indexes on status and priority columns
 - **Time-based queries**: Indexes on timestamp columns
 - **Search functionality**: Indexes on name and email columns
+- **Shift queries**: Composite indexes on (courier_id, status, start_time)
+- **FIFO queue**: Index on (status, on_duty_since) for fast queue lookups
 
 ### Performance Considerations
 - **Partitioning**: Consider partitioning orders table by date for large datasets
-- **Archiving**: Move old orders to archive tables
-- **Caching**: Use Redis for frequently accessed data like active orders and courier locations
+- **Archiving**: Move old orders and completed shifts to archive tables
+- **Caching**: Use Redis for:
+  - Active courier queue (on_duty_since ranking)
+  - Frequently accessed order status
+  - Courier locations
+  - Available shift templates
+- **Queue Optimization**: Maintain in-memory queue for hot path order assignment

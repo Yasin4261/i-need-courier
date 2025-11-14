@@ -1,0 +1,555 @@
+{
+	"info": {
+		"_postman_id": "shift-management-api",
+		"name": "I Need Courier - Shift Management API",
+		"description": "Vardiya yönetim sistemi için complete API collection.\n\n## Kullanım:\n1. Environment'ı import edin\n2. Login ile token alın\n3. Token otomatik olarak set edilir\n4. Test senaryolarını çalıştırın",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "shift-management"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Courier Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('courier_token', response.token);",
+									"    pm.environment.set('courier_id', response.courierId);",
+									"    console.log('Token saved:', response.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ahmet.yilmaz@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/courier/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "courier", "login"]
+						},
+						"description": "Kurye girişi yapar ve JWT token alır"
+					},
+					"response": []
+				},
+				{
+					"name": "Business Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('business_token', response.token);",
+									"    pm.environment.set('business_id', response.businessId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"business@example.com\",\n    \"password\": \"business123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/business/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "business", "login"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Shift Templates",
+			"item": [
+				{
+					"name": "Get Available Shift Templates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/templates",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "templates"]
+						},
+						"description": "Mevcut tüm vardiya şablonlarını listeler"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shift Template by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/templates/{{template_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "templates", "{{template_id}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Shift Reservation",
+			"item": [
+				{
+					"name": "Reserve Shift",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('shift_id', response.data.shiftId);",
+									"    console.log('Shift reserved:', response.data.shiftId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"templateId\": 1,\n    \"shiftDate\": \"2025-11-15\",\n    \"notes\": \"İlk vardiyam\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/reserve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "reserve"]
+						},
+						"description": "Vardiya rezerve eder"
+					},
+					"response": []
+				},
+				{
+					"name": "Reserve Shift - Error: Past Date",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"templateId\": 1,\n    \"shiftDate\": \"2025-11-01\",\n    \"notes\": \"Geçmiş tarih testi\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/reserve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "reserve"]
+						},
+						"description": "Geçmiş tarih hatası testi"
+					},
+					"response": []
+				},
+				{
+					"name": "Reserve Shift - Error: Overlapping",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"templateId\": 2,\n    \"shiftDate\": \"2025-11-15\",\n    \"notes\": \"Çakışma testi\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/reserve",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "reserve"]
+						},
+						"description": "Zaman çakışması hatası testi"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "My Shifts",
+			"item": [
+				{
+					"name": "Get My Upcoming Shifts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/upcoming",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "upcoming"]
+						},
+						"description": "Gelecek vardiyalarımı gösterir"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Shifts - All",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/my-shifts",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "my-shifts"]
+						},
+						"description": "Tüm vardiyalarımı gösterir"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Shifts - By Status (RESERVED)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/my-shifts?status=RESERVED",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "my-shifts"],
+							"query": [
+								{
+									"key": "status",
+									"value": "RESERVED"
+								}
+							]
+						},
+						"description": "Rezerve edilmiş vardiyalar"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Shifts - By Status (CHECKED_IN)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/my-shifts?status=CHECKED_IN",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "my-shifts"],
+							"query": [
+								{
+									"key": "status",
+									"value": "CHECKED_IN"
+								}
+							]
+						},
+						"description": "Aktif vardiyalar"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Shifts - By Status (CHECKED_OUT)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/my-shifts?status=CHECKED_OUT",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "my-shifts"],
+							"query": [
+								{
+									"key": "status",
+									"value": "CHECKED_OUT"
+								}
+							]
+						},
+						"description": "Tamamlanmış vardiyalar"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Shift",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/active",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "active"]
+						},
+						"description": "Şu anda aktif olan vardiyayı gösterir"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Check-In / Check-Out",
+			"item": [
+				{
+					"name": "Check-In to Shift",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notes\": \"Vardiyaya başladım\",\n    \"latitude\": 41.0082,\n    \"longitude\": 28.9784\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/{{shift_id}}/check-in",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "{{shift_id}}", "check-in"]
+						},
+						"description": "Vardiyaya giriş yapar (30 dakika önceden yapılabilir)"
+					},
+					"response": []
+				},
+				{
+					"name": "Check-In - Error: Too Early",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notes\": \"Çok erken giriş testi\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/{{shift_id}}/check-in",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "{{shift_id}}", "check-in"]
+						},
+						"description": "Çok erken check-in hatası"
+					},
+					"response": []
+				},
+				{
+					"name": "Check-Out from Shift",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notes\": \"Vardiya tamamlandı\",\n    \"latitude\": 41.0082,\n    \"longitude\": 28.9784\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/{{shift_id}}/check-out",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "{{shift_id}}", "check-out"]
+						},
+						"description": "Vardiyadan çıkış yapar"
+					},
+					"response": []
+				},
+				{
+					"name": "Check-Out - Error: Not Checked In",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notes\": \"Giriş yapılmadan çıkış testi\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/{{shift_id}}/check-out",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "{{shift_id}}", "check-out"]
+						},
+						"description": "Check-in yapılmadan check-out hatası"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cancel Shift",
+			"item": [
+				{
+					"name": "Cancel Shift Reservation",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/{{shift_id}}/cancel",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "{{shift_id}}", "cancel"]
+						},
+						"description": "Vardiya rezervasyonunu iptal eder (2 saat öncesine kadar)"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Shift - Error: Too Late",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{courier_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/courier/shifts/{{shift_id}}/cancel",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "courier", "shifts", "{{shift_id}}", "cancel"]
+						},
+						"description": "Geç iptal hatası testi"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "API Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/health",
+							"host": ["{{base_url}}"],
+							"path": ["actuator", "health"]
+						},
+						"description": "API sağlık kontrolü"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
+

@@ -7,6 +7,100 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2025-11-14
+
+### Added
+- Courier Shift Management system
+  - GET `/api/v1/courier/shifts/templates` – List shift templates
+  - POST `/api/v1/courier/shifts/reserve` – Reserve a shift
+  - GET `/api/v1/courier/shifts/upcoming` – Upcoming shifts
+  - GET `/api/v1/courier/shifts/my-shifts` – List my shifts (with status filter)
+  - GET `/api/v1/courier/shifts/active` – Active shift
+  - POST `/api/v1/courier/shifts/{id}/check-in` – Check-in
+  - POST `/api/v1/courier/shifts/{id}/check-out` – Check-out
+  - DELETE `/api/v1/courier/shifts/{id}/cancel` – Cancel reservation
+- Bash test script `test-shift-yasin.sh` with auto-cancel and parameters (SHIFT_DATE, TEMPLATE_INDEX)
+- Postman collections and shift testing guide under docs/guides
+
+### Changed
+- Global exception handler improvements for method/media type errors
+- Security enhancements: added JwtAuthenticationEntryPoint and JwtAccessDeniedHandler
+
+### Fixed
+- PostgreSQL enum mismatch on `shifts.shift_role` and `shifts.status` by converting to VARCHAR (manual SQL + V13 migration file)
+
+---
+
+## [1.2.0] - 2025-11-07
+
+### Added
+- **Business Order Management System**: Complete CRUD operations for orders
+- **8 New API Endpoints**: Full order management functionality
+  - POST `/api/v1/business/orders` - Create order
+  - GET `/api/v1/business/orders` - List all orders
+  - GET `/api/v1/business/orders?status=X` - Filter by status
+  - GET `/api/v1/business/orders/{id}` - Get order details
+  - PUT `/api/v1/business/orders/{id}` - Update order
+  - DELETE `/api/v1/business/orders/{id}` - Delete order
+  - POST `/api/v1/business/orders/{id}/cancel` - Cancel order
+  - GET `/api/v1/business/orders/statistics` - Get statistics
+- **Order Entity**: New Order model with full order lifecycle support
+- **Order Enums**: OrderStatus, OrderPriority, PaymentType
+- **BusinessOrderService**: Service layer for order operations
+- **OrderRepository**: Custom queries for order management
+- **Order DTOs**: OrderCreateRequest, OrderUpdateRequest, OrderResponse
+- **Auto-generated Order Numbers**: Format ORD-YYYYMMDD-XXX
+- **Order Statistics Endpoint**: Real-time order statistics
+- **Status-based Filtering**: Filter orders by status
+- **Business Ownership Verification**: Users can only access their own orders
+- **PostgreSQL Enum Support**: Fixed enum type mapping with @JdbcTypeCode
+- **Comprehensive Test Suite**: 
+  - `BUSINESS_ORDER_CURL_TESTS.md` - Complete curl examples
+  - `BUSINESS_ORDER_IMPLEMENTATION.md` - Implementation guide
+  - `POSTGRES_ENUM_FIX.md` - Enum fix documentation
+  - `TEST_README.md` - Quick start guide
+  - Postman collection with 17 requests
+  - Python automated test script
+  - Bash test script for quick validation
+
+### Changed
+- **Architecture**: Implemented Clean Layered Architecture
+- **Package Structure**: Added separate `business` package for business features
+- **Security Config**: Updated to allow business endpoints (temporary)
+- **Hibernate Config**: Added PostgreSQL dialect configuration
+- **Application Properties**: Enhanced JPA/Hibernate settings
+
+### Fixed
+- **PostgreSQL Enum Type Mismatch**: Fixed payment_type, order_status, order_priority casting
+- **Hibernate Enum Mapping**: Added @JdbcTypeCode for proper enum handling
+- **Security Configuration**: Fixed 403 Forbidden on business endpoints
+- **JPA Configuration**: Resolved LOB handling issues
+
+### Security
+- **JWT Authorization**: All order endpoints require valid JWT token
+- **Ownership Validation**: Business can only access their own orders
+- **Status-based Operations**: PENDING orders can be updated/deleted, ASSIGNED can be cancelled
+- **Authorization Checks**: Every operation validates ownership
+
+### Technical
+- **Clean Layered Architecture**: Controller → Service → Repository → Model
+- **SOLID Principles**: Interface segregation, dependency injection
+- **Repository Pattern**: Custom queries and data access abstraction
+- **DTO Pattern**: Separate request/response models
+- **Exception Handling**: Custom exceptions with global handler
+- **Validation**: Input validation with Jakarta validation
+
+### Documentation
+- Added detailed curl test guide with all endpoints
+- Added implementation documentation
+- Added PostgreSQL enum fix documentation
+- Added Postman collection for easy testing
+- Added Python and Bash test scripts
+- Updated README with new features
+- Updated VERSION.md with v1.2.0
+
+---
+
 ## [1.1.0] - 2025-11-07
 
 ### Added
@@ -170,4 +264,3 @@ The following endpoints are deprecated and will be removed in v2.0.0:
 
 [1.1.0]: https://github.com/YOUR_USERNAME/i-need-courier/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/YOUR_USERNAME/i-need-courier/releases/tag/v1.0.0
-
