@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   # PostgreSQL with PostGIS
   postgres:
-    image: postgis/postgis:15-3.3
+    image: postgis/postgis:17-3.6-alpine
     container_name: courier-postgres
     environment:
       POSTGRES_DB: courier_db
@@ -24,7 +22,7 @@ services:
 
   # Redis Cache
   redis:
-    image: redis:7-alpine
+    image: redis:8.4.0-alpine
     container_name: courier-redis
     ports:
       - "6380:6379"  # Yerel Redis çakışmalarını önlüyoruz
