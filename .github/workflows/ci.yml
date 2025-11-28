@@ -58,7 +58,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build Docker image
-      run: docker build -t i-need-courier:${{ github.sha }} .
+      run: docker build --quiet -t i-need-courier:${{ github.sha }} .
 
     - name: Run security scan
       uses: aquasecurity/trivy-action@master
