@@ -12,7 +12,7 @@ jobs:
 
     services:
       postgres:
-        image: postgis/postgis:16-3.4-alpine
+        image: postgis/postgis:17-3.6-alpine
         env:
           POSTGRES_DB: courier_db
           POSTGRES_USER: courier_user
@@ -36,18 +36,24 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Build with Maven
-      run: ./mvnw clean install -DskipTests
-
-    - name: Run tests
-      run: ./mvnw test
+    - name: Build and Run Tests
+      run: ./mvnw clean install
       env:
         SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/courier_db
         SPRING_DATASOURCE_USERNAME: courier_user
         SPRING_DATASOURCE_PASSWORD: courier_pass
 
-    - name: Generate test coverage report
-      run: ./mvnw jacoco:report
+    - name: Upload JaCoCo report
+      uses: actions/upload-artifact@v4
+      with:
+        name: jacoco-report
+        path: target/site/jacoco/
+
+    - name: Publish test coverage summary
+      uses: madrapps/jacoco-report@v1.7.0
+      with:
+        paths: target/site/jacoco/jacoco.xml
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build Docker image
       run: docker build -t i-need-courier:${{ github.sha }} .
