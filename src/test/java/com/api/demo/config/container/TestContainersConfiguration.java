@@ -23,7 +23,6 @@ public class TestContainersConfiguration {
     }
 
     @Bean
-    @ServiceConnection
     ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
