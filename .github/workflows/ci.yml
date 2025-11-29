@@ -55,11 +55,13 @@ jobs:
 
     - name: Publish test coverage summary
       uses: madrapps/jacoco-report@v1.7.2
+      env:
+        PR_TITLE: ${{ github.event.pull_request.title }}
       with:
         paths: |
-          ${{ github.workspace }}/**/build/reports/jacoco/prodNormalDebugCoverage/prodNormalDebugCoverage.xml,
-          ${{ github.workspace }}/**/build/reports/jacoco/**/debugCoverage.xml
+          **/target/site/jacoco/*.xml
         token: ${{ secrets.GITHUB_TOKEN }}
+        title: ${{ env.PR_TITLE }}
         min-coverage-overall: 0
         min-coverage-changed-files: 0
         update-comment: true
