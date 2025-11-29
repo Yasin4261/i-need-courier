@@ -3,19 +3,19 @@ package com.api.demo.controller;
 import com.api.demo.config.container.TestContainersConfiguration;
 import com.api.demo.dto.BusinessRegistrationRequest;
 import com.api.demo.repository.BusinessRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.RestClient;
+import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.io.IOException;
@@ -23,13 +23,10 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @Import(TestContainersConfiguration.class)
-@AutoConfigureJsonTesters
+@AutoConfigureMockMvc
 public class RegistrationControllerIT {
-
-    @LocalServerPort
-    private Integer port;
 
     @Autowired
     private PostgreSQLContainer postgres;
@@ -37,7 +34,11 @@ public class RegistrationControllerIT {
     @Autowired
     BusinessRepository businessRepository;
 
-    private final RestClient restClient = RestClient.create();
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    MockMvcTester mockMvc;
 
     @BeforeEach
     void setUp() {
@@ -48,14 +49,13 @@ public class RegistrationControllerIT {
     @ValueSource(strings = {"/courier", "/business"})
     void postWithoutPathReturnsBadRequestForEmptyBody(String path) throws IOException {
         // GIVEN WHEN
-        var response = restClient.post()
-                .uri(endpoint(path))
+        var response = mockMvc.post()
+                .uri("/api/v1/auth/register" + path)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body("{}")
-                .exchange((req, res) -> res);
+                .exchange();
 
         // THEN
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response).hasStatus(HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -85,24 +85,20 @@ public class RegistrationControllerIT {
                 }
                 """;
 
-        // WHEN THEN
-        restClient.post()
-                .uri(endpoint("/business"))
+        // WHEN
+        var response = mockMvc
+                .post()
+                .uri("/api/v1/auth/register/business")
+                .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(request)
-                .exchange((req, res) -> {
-                    // todo - 201 created instead?
-                    assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
-                    var actual = res.bodyTo(String.class);
-                    // todo - needs a better approach for asserting ApiResponse wrapped DTOs
-                    assertThat(actual).isEqualToIgnoringWhitespace(expectedResponse);
-                    return actual;
-                });
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange();
 
-    }
-
-
-    private String endpoint(String endpoint) {
-        return "http://localhost" + ":" + port + "/api/v1/auth/register" + endpoint;
+        // THEN
+        assertThat(response)
+                .hasStatus(HttpStatus.OK)
+                .hasContentType(MediaType.APPLICATION_JSON_VALUE)
+                .bodyJson()
+                .isLenientlyEqualTo(expectedResponse);
     }
 }
