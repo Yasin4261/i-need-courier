@@ -56,8 +56,6 @@ jobs:
 
     - name: Publish test coverage summary
       uses: madrapps/jacoco-report@v1.7.2
-#      env:
-#        PR_TITLE: ${{ github.event.pull_request.title }}
       with:
         paths: ${{ github.workspace }}/**/target/site/jacoco/*.xml
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -67,12 +65,16 @@ jobs:
         update-comment: true
         pass-emoji: ':white_check_mark:'
         fail-emoji: ':x:'
+    - name: CodeQL Analysis # CodeQL for source code scan
+      uses: github/codeql-action/init@v3
+      with:
+        languages: java
 
     - name: Build Docker image
       run: docker build --quiet -t i-need-courier:${{ github.sha }} .
 
     - name: Run security scan
-      uses: aquasecurity/trivy-action@master
+      uses: aquasecurity/trivy-action@master # Trivy for docker image scan
       with:
         image-ref: i-need-courier:${{ github.sha }}
         format: 'sarif'
