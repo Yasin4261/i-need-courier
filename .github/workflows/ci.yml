@@ -6,14 +6,15 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+permissions:
+  contents: write
+  pull-requests: write
+  repository-projects: write
+  security-events: write
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      repository-projects: write
-
     services:
       postgres:
         image: postgis/postgis:17-3.6-alpine
@@ -55,8 +56,6 @@ jobs:
 
     - name: Publish test coverage summary
       uses: madrapps/jacoco-report@v1.7.2
-#      env:
-#        PR_TITLE: ${{ github.event.pull_request.title }}
       with:
         paths: ${{ github.workspace }}/**/target/site/jacoco/*.xml
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -66,18 +65,24 @@ jobs:
         update-comment: true
         pass-emoji: ':white_check_mark:'
         fail-emoji: ':x:'
+        debug-mode: 'true'
+    - name: CodeQL Analysis # CodeQL for source code scan
+      uses: github/codeql-action/init@v4
+      with:
+        languages: java
+        trap-caching: false
 
     - name: Build Docker image
       run: docker build --quiet -t i-need-courier:${{ github.sha }} .
 
-    - name: Run security scan
-      uses: aquasecurity/trivy-action@master
+    - name: Run docker image security scan
+      uses: aquasecurity/trivy-action@master # Trivy for docker image scan
       with:
         image-ref: i-need-courier:${{ github.sha }}
         format: 'sarif'
         output: 'trivy-results.sarif'
 
-    - name: Upload security scan results
+    - name: Upload docker image security scan results
       uses: github/codeql-action/upload-sarif@v4
       if: always()
       with:
