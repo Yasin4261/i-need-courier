@@ -1,6 +1,8 @@
 package com.api.demo.model;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -54,8 +56,8 @@ public class Business {
     @Column(name = "payment_terms")
     private PaymentTerms paymentTerms = PaymentTerms.POSTPAID;
 
-    @Column
-    private Double creditLimit = 0.0;
+    @Column(name = "credit_limit", precision = 10, scale = 2, nullable = false)
+    private BigDecimal creditLimit = BigDecimal.ZERO;
 
     @Column(name = "is_active")
     private Boolean isActive = true;
@@ -263,11 +265,11 @@ public class Business {
         this.paymentTerms = paymentTerms;
     }
 
-    public Double getCreditLimit() {
+    public BigDecimal getCreditLimit() {
         return creditLimit;
     }
 
-    public void setCreditLimit(Double creditLimit) {
+    public void setCreditLimit(BigDecimal creditLimit) {
         this.creditLimit = creditLimit;
     }
 
