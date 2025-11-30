@@ -69,6 +69,7 @@ jobs:
       uses: github/codeql-action/init@v4
       with:
         languages: java
+        trap-caching: false
 
     - name: Build Docker image
       run: docker build --quiet -t i-need-courier:${{ github.sha }} .
