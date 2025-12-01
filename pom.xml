@@ -315,6 +315,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Flyway Maven Plugin for Database Migration Management -->
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>11.7.2</version>
+                <configuration>
+                    <url>jdbc:postgresql://localhost:5433/courier_db</url>
+                    <user>courier_user</user>
+                    <password>courier_password</password>
+                    <cleanDisabled>true</cleanDisabled>
+                    <validateOnMigrate>true</validateOnMigrate>
+                    <baselineOnMigrate>true</baselineOnMigrate>
+                    <locations>classpath:db/migration</locations>
+                    <schemas>public</schemas>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
