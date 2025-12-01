@@ -3,7 +3,6 @@ package com.api.demo.controller;
 import com.api.demo.config.container.TestContainersConfiguration;
 import com.api.demo.dto.BusinessRegistrationRequest;
 import com.api.demo.repository.BusinessRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.testcontainers.postgresql.PostgreSQLContainer;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 
@@ -35,7 +35,7 @@ public class RegistrationControllerIT {
     BusinessRepository businessRepository;
 
     @Autowired
-    ObjectMapper objectMapper;
+    JsonMapper objectMapper;
 
     @Autowired
     MockMvcTester mockMvc;
