@@ -36,39 +36,66 @@ services:
     networks:
       - courier-network
 
-  # Zookeeper
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    container_name: courier-zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2182:2181"  # Yerel çakışmaları önleme
-    networks:
-      - courier-network
-
-  # Kafka - düzeltilmiş yapılandırma
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: apache/kafka:4.1.1
     container_name: courier-kafka
-    depends_on:
-      - zookeeper
+    ports:
+      - "9092:9092"    # Internal listener (docker network)
+      - "9094:9094"    # External listener (host machine)
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      # unique node id per broker
+      KAFKA_NODE_ID: 1
+      # unique cluster id for KRaft
+      KAFKA_CLUSTER_ID: 'courier-cluster'
+      # within docker network, it will act as both broker and controller
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      # list of controller nodes that form the Raft quorum
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+      # listener name used by controllers for internal raft communication
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      # listener endpoints for the node
+      KAFKA_LISTENERS: >
+        PLAINTEXT://:9092,
+        EXTERNAL://:9094,
+        CONTROLLER://:9093
+      # defines what listeners advertise to connecting clients
+      # internal: kafka:9092
+      # external: localhost:9094
+      KAFKA_ADVERTISED_LISTENERS: >
+        PLAINTEXT://kafka:9092,
+        EXTERNAL://localhost:9094
+      # maps listener names to their security protocols
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: >
+        PLAINTEXT:PLAINTEXT,
+        CONTROLLER:PLAINTEXT,
+        EXTERNAL:PLAINTEXT
+      # defines which listener should use for inter-broker communication
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      # single-node cluster safety settings
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      # Gerekli Kafka parametreleri
-      KAFKA_PROCESS_ROLES: broker
-      KAFKA_NODE_ID: 1
+      # broker defaults for better local performance
+      # help speeding up consumer group startups
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      # auto-create topics if they not exist
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      # default number of partitions per topic
+      KAFKA_NUM_PARTITIONS: 1
+    networks:
+      - courier-network
+
+  kafka-ui:
+    image: kafbat/kafka-ui:main
     ports:
-      - "29092:29092"  # Dış erişim için port
-      - "9093:9092"    # Yerel çakışmaları önlemek için değiştirildi
+      - "8082:8080"
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      BOOTSTRAPSERVERS_CONFIG: kafka:9092
+      KAFKA_CLUSTERS_0_NAME: courier-kafka
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
     networks:
       - courier-network
 
