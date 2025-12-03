@@ -13,8 +13,7 @@ import com.api.demo.model.Order;
 import com.api.demo.model.enums.OrderStatus;
 import com.api.demo.repository.BusinessRepository;
 import com.api.demo.repository.OrderRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,9 +27,8 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@Slf4j
 public class BusinessOrderServiceImpl implements BusinessOrderService {
-
-    private static final Logger logger = LoggerFactory.getLogger(BusinessOrderServiceImpl.class);
 
     private final OrderRepository orderRepository;
     private final BusinessRepository businessRepository;
@@ -42,7 +40,7 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
 
     @Override
     public OrderResponse createOrder(OrderCreateRequest request, Long businessId) {
-        logger.info("Creating order for business ID: {}", businessId);
+        log.info("Creating order for business ID: {}", businessId);
 
         // Get business
         Business business = businessRepository.findById(businessId)
@@ -94,7 +92,7 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
 
         // Save order
         Order savedOrder = orderRepository.save(order);
-        logger.info("Order created successfully with ID: {} and number: {}", savedOrder.getId(), savedOrder.getOrderNumber());
+        log.info("Order created successfully with ID: {} and number: {}", savedOrder.getId(), savedOrder.getOrderNumber());
 
         return mapToResponse(savedOrder);
     }
@@ -102,7 +100,7 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
     @Override
     @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long orderId, Long businessId) {
-        logger.info("Fetching order ID: {} for business ID: {}", orderId, businessId);
+        log.info("Fetching order ID: {} for business ID: {}", orderId, businessId);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
@@ -116,7 +114,7 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
     @Override
     @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrders(Long businessId, OrderStatus status) {
-        logger.info("Fetching orders for business ID: {}, status: {}", businessId, status);
+        log.info("Fetching orders for business ID: {}, status: {}", businessId, status);
 
         List<Order> orders;
         if (status != null) {
@@ -132,7 +130,7 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
 
     @Override
     public OrderResponse updateOrder(Long orderId, OrderUpdateRequest request, Long businessId) {
-        logger.info("Updating order ID: {} for business ID: {}", orderId, businessId);
+        log.info("Updating order ID: {} for business ID: {}", orderId, businessId);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
@@ -198,14 +196,14 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
         }
 
         Order updatedOrder = orderRepository.save(order);
-        logger.info("Order updated successfully: {}", orderId);
+        log.info("Order updated successfully: {}", orderId);
 
         return mapToResponse(updatedOrder);
     }
 
     @Override
     public void deleteOrder(Long orderId, Long businessId) {
-        logger.info("Deleting order ID: {} for business ID: {}", orderId, businessId);
+        log.info("Deleting order ID: {} for business ID: {}", orderId, businessId);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
@@ -221,12 +219,12 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
         }
 
         orderRepository.delete(order);
-        logger.info("Order deleted successfully: {}", orderId);
+        log.info("Order deleted successfully: {}", orderId);
     }
 
     @Override
     public OrderResponse cancelOrder(Long orderId, Long businessId, String reason) {
-        logger.info("Cancelling order ID: {} for business ID: {}, reason: {}", orderId, businessId, reason);
+        log.info("Cancelling order ID: {} for business ID: {}, reason: {}", orderId, businessId, reason);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
@@ -238,7 +236,7 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
         if (!order.isCancellable()) {
             throw new InvalidOrderOperationException(
                     "Cannot cancel order in status: " + order.getStatus() +
-                    ". Only PENDING or ASSIGNED orders can be cancelled."
+                            ". Only PENDING or ASSIGNED orders can be cancelled."
             );
         }
 
@@ -255,7 +253,7 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
         }
 
         Order cancelledOrder = orderRepository.save(order);
-        logger.info("Order cancelled successfully: {}", orderId);
+        log.info("Order cancelled successfully: {}", orderId);
 
         return mapToResponse(cancelledOrder);
     }
@@ -263,7 +261,7 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
     @Override
     @Transactional(readOnly = true)
     public OrderStatistics getOrderStatistics(Long businessId) {
-        logger.info("Fetching order statistics for business ID: {}", businessId);
+        log.info("Fetching order statistics for business ID: {}", businessId);
 
         OrderStatistics stats = new OrderStatistics();
         stats.setTotalOrders(orderRepository.countByBusinessId(businessId));
@@ -281,7 +279,7 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
      */
     private void verifyOrderOwnership(Order order, Long businessId) {
         if (!order.belongsTo(businessId)) {
-            logger.warn("Business ID: {} attempted to access order ID: {} belonging to business ID: {}",
+            log.warn("Business ID: {} attempted to access order ID: {} belonging to business ID: {}",
                     businessId, order.getId(), order.getBusiness().getId());
             throw new UnauthorizedAccessException("You can only access your own orders");
         }

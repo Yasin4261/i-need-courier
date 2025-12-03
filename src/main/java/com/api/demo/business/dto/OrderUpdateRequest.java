@@ -3,6 +3,9 @@ package com.api.demo.business.dto;
 import com.api.demo.model.enums.OrderPriority;
 import com.api.demo.model.enums.PaymentType;
 import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,8 +14,12 @@ import java.time.LocalDateTime;
  * DTO for updating an existing order
  * Only allows updating specific fields when order is in PENDING status
  */
+@Setter
+@Getter
+@NoArgsConstructor
 public class OrderUpdateRequest {
 
+    // Getters and Setters
     @Size(min = 10, max = 500, message = "Pickup address must be between 10 and 500 characters")
     private String pickupAddress;
 
@@ -62,137 +69,5 @@ public class OrderUpdateRequest {
 
     private LocalDateTime scheduledPickupTime;
 
-    // Constructors
-    public OrderUpdateRequest() {
-    }
-
-    // Getters and Setters
-    public String getPickupAddress() {
-        return pickupAddress;
-    }
-
-    public void setPickupAddress(String pickupAddress) {
-        this.pickupAddress = pickupAddress;
-    }
-
-    public String getPickupAddressDescription() {
-        return pickupAddressDescription;
-    }
-
-    public void setPickupAddressDescription(String pickupAddressDescription) {
-        this.pickupAddressDescription = pickupAddressDescription;
-    }
-
-    public String getPickupContactPerson() {
-        return pickupContactPerson;
-    }
-
-    public void setPickupContactPerson(String pickupContactPerson) {
-        this.pickupContactPerson = pickupContactPerson;
-    }
-
-    public String getDeliveryAddress() {
-        return deliveryAddress;
-    }
-
-    public void setDeliveryAddress(String deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
-    }
-
-    public String getDeliveryAddressDescription() {
-        return deliveryAddressDescription;
-    }
-
-    public void setDeliveryAddressDescription(String deliveryAddressDescription) {
-        this.deliveryAddressDescription = deliveryAddressDescription;
-    }
-
-    public String getEndCustomerName() {
-        return endCustomerName;
-    }
-
-    public void setEndCustomerName(String endCustomerName) {
-        this.endCustomerName = endCustomerName;
-    }
-
-    public String getEndCustomerPhone() {
-        return endCustomerPhone;
-    }
-
-    public void setEndCustomerPhone(String endCustomerPhone) {
-        this.endCustomerPhone = endCustomerPhone;
-    }
-
-    public String getPackageDescription() {
-        return packageDescription;
-    }
-
-    public void setPackageDescription(String packageDescription) {
-        this.packageDescription = packageDescription;
-    }
-
-    public BigDecimal getPackageWeight() {
-        return packageWeight;
-    }
-
-    public void setPackageWeight(BigDecimal packageWeight) {
-        this.packageWeight = packageWeight;
-    }
-
-    public Integer getPackageCount() {
-        return packageCount;
-    }
-
-    public void setPackageCount(Integer packageCount) {
-        this.packageCount = packageCount;
-    }
-
-    public OrderPriority getPriority() {
-        return priority;
-    }
-
-    public void setPriority(OrderPriority priority) {
-        this.priority = priority;
-    }
-
-    public PaymentType getPaymentType() {
-        return paymentType;
-    }
-
-    public void setPaymentType(PaymentType paymentType) {
-        this.paymentType = paymentType;
-    }
-
-    public BigDecimal getDeliveryFee() {
-        return deliveryFee;
-    }
-
-    public void setDeliveryFee(BigDecimal deliveryFee) {
-        this.deliveryFee = deliveryFee;
-    }
-
-    public BigDecimal getCollectionAmount() {
-        return collectionAmount;
-    }
-
-    public void setCollectionAmount(BigDecimal collectionAmount) {
-        this.collectionAmount = collectionAmount;
-    }
-
-    public String getBusinessNotes() {
-        return businessNotes;
-    }
-
-    public void setBusinessNotes(String businessNotes) {
-        this.businessNotes = businessNotes;
-    }
-
-    public LocalDateTime getScheduledPickupTime() {
-        return scheduledPickupTime;
-    }
-
-    public void setScheduledPickupTime(LocalDateTime scheduledPickupTime) {
-        this.scheduledPickupTime = scheduledPickupTime;
-    }
 }
 

@@ -9,8 +9,7 @@ import com.api.demo.exception.InvalidCredentialsException;
 import com.api.demo.model.Business;
 import com.api.demo.repository.BusinessRepository;
 import com.api.demo.security.JwtTokenProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +19,8 @@ import java.util.UUID;
 
 @Service
 @Transactional
+@Slf4j
 public class BusinessAuthService {
-
-    private static final Logger logger = LoggerFactory.getLogger(BusinessAuthService.class);
 
     private final BusinessRepository businessRepository;
     private final PasswordEncoder passwordEncoder;
@@ -37,7 +35,7 @@ public class BusinessAuthService {
     }
 
     public BusinessRegistrationResponse register(BusinessRegistrationRequest request) {
-        logger.info("Attempting to register business: {}", request.getName());
+        log.info("Attempting to register business: {}", request.getName());
 
         if (businessRepository.existsByEmail(request.getEmail())) {
             throw new CourierAlreadyExistsException("Business already exists with email: " + request.getEmail());
@@ -74,7 +72,7 @@ public class BusinessAuthService {
     }
 
     public BusinessLoginResponse login(BusinessLoginRequest request) {
-        logger.info("Login attempt for business email: {}", request.getEmail());
+        log.info("Login attempt for business email: {}", request.getEmail());
 
         Business business = businessRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));

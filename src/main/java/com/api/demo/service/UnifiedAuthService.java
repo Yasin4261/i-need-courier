@@ -5,11 +5,11 @@ import com.api.demo.dto.UnifiedLoginResponse;
 import com.api.demo.exception.InvalidCredentialsException;
 import com.api.demo.model.Business;
 import com.api.demo.model.Courier;
+import com.api.demo.model.enums.UserType;
 import com.api.demo.repository.BusinessRepository;
 import com.api.demo.repository.CourierRepository;
 import com.api.demo.security.JwtTokenProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +18,9 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@Slf4j
 public class UnifiedAuthService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UnifiedAuthService.class);
     private final CourierRepository courierRepository;
     private final BusinessRepository businessRepository;
     private final PasswordEncoder passwordEncoder;
@@ -35,7 +35,7 @@ public class UnifiedAuthService {
     }
 
     public UnifiedLoginResponse login(UnifiedLoginRequest request) {
-        logger.info("Unified login attempt for email: {}", request.getEmail());
+        log.info("Unified login attempt for email: {}", request.getEmail());
 
         Optional<Courier> courierOpt = courierRepository.findByEmail(request.getEmail());
         if (courierOpt.isPresent()) {
@@ -47,7 +47,7 @@ public class UnifiedAuthService {
             return loginBusiness(businessOpt.get(), request.getPassword());
         }
 
-        logger.warn("Login failed: User not found with email: {}", request.getEmail());
+        log.warn("Login failed: User not found with email: {}", request.getEmail());
         throw new InvalidCredentialsException("Invalid email or password");
     }
 
@@ -64,7 +64,7 @@ public class UnifiedAuthService {
         String token = jwtTokenProvider.generateToken(courier.getId(), courier.getEmail(), "COURIER");
 
         return new UnifiedLoginResponse(token, courier.getId(), courier.getEmail(),
-                courier.getName(), "COURIER", courier.getStatus().toString(), "Login successful");
+                courier.getName(), UserType.COURIER, courier.getStatus().toString(), "Login successful");
     }
 
     private UnifiedLoginResponse loginBusiness(Business business, String password) {
@@ -81,7 +81,7 @@ public class UnifiedAuthService {
         String token = jwtTokenProvider.generateToken(business.getId(), business.getEmail(), "BUSINESS");
 
         return new UnifiedLoginResponse(token, business.getId(), business.getEmail(),
-                business.getName(), "BUSINESS", business.getStatus().toString(), "Login successful");
+                business.getName(), UserType.BUSINESS, business.getStatus().toString(), "Login successful");
     }
 }
 
