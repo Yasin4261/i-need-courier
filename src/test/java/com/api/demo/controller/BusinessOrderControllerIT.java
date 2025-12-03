@@ -9,8 +9,6 @@ import com.api.demo.model.enums.PaymentType;
 import com.api.demo.repository.BusinessRepository;
 import com.api.demo.repository.OrderRepository;
 import com.api.demo.security.JwtTokenProvider;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -98,7 +96,7 @@ public class BusinessOrderControllerIT {
         expectedResponse.setEndCustomerPhone("+905551234567");
         expectedResponse.setEstimatedDeliveryTime(null);
         expectedResponse.setOrderId(4L);
-        expectedResponse.setOrderNumber("ORD-20251201-001");
+        expectedResponse.setOrderNumber("ORD-20251203-001");
         expectedResponse.setPackageCount(2);
         expectedResponse.setPackageDescription("2x Pizza Margherita");
         expectedResponse.setPackageWeight(BigDecimal.valueOf(1.5));

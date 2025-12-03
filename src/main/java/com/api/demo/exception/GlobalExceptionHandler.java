@@ -2,8 +2,7 @@ package com.api.demo.exception;
 
 import com.api.demo.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -21,9 +20,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
  * Provides consistent and detailed error responses across the application.
  */
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * Handle validation errors from @Valid annotation.
@@ -46,7 +44,7 @@ public class GlobalExceptionHandler {
             errorResponse.addValidationError(fieldName, errorMessage);
         });
 
-        logger.warn("Validation error on {}: {}", request.getRequestURI(), errorResponse.getValidationErrors());
+        log.warn("Validation error on {}: {}", request.getRequestURI(), errorResponse.getValidationErrors());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -61,7 +59,7 @@ public class GlobalExceptionHandler {
             CourierAlreadyExistsException ex,
             HttpServletRequest request) {
 
-        logger.warn("Courier already exists: {}", ex.getMessage());
+        log.warn("Courier already exists: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 409,
@@ -83,7 +81,7 @@ public class GlobalExceptionHandler {
             InvalidCredentialsException ex,
             HttpServletRequest request) {
 
-        logger.warn("Invalid credentials: {}", ex.getMessage());
+        log.warn("Invalid credentials: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 401,
@@ -105,7 +103,7 @@ public class GlobalExceptionHandler {
             OrderNotFoundException ex,
             HttpServletRequest request) {
 
-        logger.warn("Order not found: {}", ex.getMessage());
+        log.warn("Order not found: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 404,
@@ -127,7 +125,7 @@ public class GlobalExceptionHandler {
             UnauthorizedAccessException ex,
             HttpServletRequest request) {
 
-        logger.warn("Unauthorized access: {}", ex.getMessage());
+        log.warn("Unauthorized access: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 403,
@@ -149,7 +147,7 @@ public class GlobalExceptionHandler {
             InvalidOrderOperationException ex,
             HttpServletRequest request) {
 
-        logger.warn("Invalid order operation: {}", ex.getMessage());
+        log.warn("Invalid order operation: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 400,
@@ -171,7 +169,7 @@ public class GlobalExceptionHandler {
             BusinessException ex,
             HttpServletRequest request) {
 
-        logger.warn("Business exception: {}", ex.getMessage());
+        log.warn("Business exception: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 400,
@@ -193,7 +191,7 @@ public class GlobalExceptionHandler {
             RuntimeException ex,
             HttpServletRequest request) {
 
-        logger.error("Unexpected error: {}", ex.getMessage(), ex);
+        log.error("Unexpected error: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 500,
@@ -215,7 +213,7 @@ public class GlobalExceptionHandler {
             HttpMessageNotReadableException ex,
             HttpServletRequest request) {
 
-        logger.warn("Malformed JSON request: {}", ex.getMessage());
+        log.warn("Malformed JSON request: {}", ex.getMessage());
 
         String detailedMessage = "Malformed JSON request body. Please check your JSON syntax.";
         if (ex.getCause() != null) {
@@ -247,7 +245,7 @@ public class GlobalExceptionHandler {
             HttpRequestMethodNotSupportedException ex,
             HttpServletRequest request) {
 
-        logger.warn("Method not supported: {} for {}", ex.getMethod(), request.getRequestURI());
+        log.warn("Method not supported: {} for {}", ex.getMethod(), request.getRequestURI());
 
         String supportedMethods = ex.getSupportedHttpMethods() != null
                 ? String.join(", ", ex.getSupportedHttpMethods().stream().map(method -> method.name()).toList())
@@ -274,7 +272,7 @@ public class GlobalExceptionHandler {
             HttpMediaTypeNotSupportedException ex,
             HttpServletRequest request) {
 
-        logger.warn("Unsupported media type: {}", ex.getContentType());
+        log.warn("Unsupported media type: {}", ex.getContentType());
 
         String supportedTypes = ex.getSupportedMediaTypes() != null
                 ? ex.getSupportedMediaTypes().toString()
@@ -301,7 +299,7 @@ public class GlobalExceptionHandler {
             MissingServletRequestParameterException ex,
             HttpServletRequest request) {
 
-        logger.warn("Missing parameter: {}", ex.getParameterName());
+        log.warn("Missing parameter: {}", ex.getParameterName());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 400,
@@ -324,7 +322,7 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException ex,
             HttpServletRequest request) {
 
-        logger.warn("Type mismatch for parameter: {}", ex.getName());
+        log.warn("Type mismatch for parameter: {}", ex.getName());
 
         String expectedType = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown";
 
@@ -349,7 +347,7 @@ public class GlobalExceptionHandler {
             IllegalStateException ex,
             HttpServletRequest request) {
 
-        logger.error("Illegal state: {}", ex.getMessage());
+        log.error("Illegal state: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 500,
@@ -371,7 +369,7 @@ public class GlobalExceptionHandler {
             IllegalArgumentException ex,
             HttpServletRequest request) {
 
-        logger.warn("Illegal argument: {}", ex.getMessage());
+        log.warn("Illegal argument: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 400,
@@ -393,7 +391,7 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request) {
 
-        logger.error("System error: {}", ex.getMessage(), ex);
+        log.error("System error: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 500,

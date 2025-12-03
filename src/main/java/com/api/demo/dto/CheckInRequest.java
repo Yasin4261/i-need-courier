@@ -1,43 +1,16 @@
 package com.api.demo.dto;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-/**
- * Check-in isteği
- */
+@NoArgsConstructor
+@Getter
+@Setter
 public class CheckInRequest {
 
     private String notes;
     private Double latitude;
     private Double longitude;
-
-    // Constructors
-    public CheckInRequest() {
-    }
-
-    // Getters and Setters
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
 }
 

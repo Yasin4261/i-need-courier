@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,17 +28,12 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 @Tag(name = "Business Orders", description = "Business order management endpoints")
 @SecurityRequirement(name = "bearerAuth")
+@Slf4j
+@RequiredArgsConstructor
 public class BusinessOrderController {
-
-    private static final Logger logger = LoggerFactory.getLogger(BusinessOrderController.class);
 
     private final BusinessOrderService orderService;
     private final JwtTokenProvider jwtTokenProvider;
-
-    public BusinessOrderController(BusinessOrderService orderService, JwtTokenProvider jwtTokenProvider) {
-        this.orderService = orderService;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
 
     /**
      * Create a new order
@@ -50,7 +45,7 @@ public class BusinessOrderController {
             @RequestHeader("Authorization") String authHeader) {
 
         Long businessId = extractBusinessIdFromToken(authHeader);
-        logger.info("Business {} creating new order", businessId);
+        log.info("Business {} creating new order", businessId);
 
         OrderResponse response = orderService.createOrder(request, businessId);
 
@@ -69,7 +64,7 @@ public class BusinessOrderController {
             @RequestHeader("Authorization") String authHeader) {
 
         Long businessId = extractBusinessIdFromToken(authHeader);
-        logger.info("Business {} fetching orders with status: {}", businessId, status);
+        log.info("Business {} fetching orders with status: {}", businessId, status);
 
         List<OrderResponse> orders = orderService.getAllOrders(businessId, status);
 
@@ -90,7 +85,7 @@ public class BusinessOrderController {
             @RequestHeader("Authorization") String authHeader) {
 
         Long businessId = extractBusinessIdFromToken(authHeader);
-        logger.info("Business {} fetching order {}", businessId, orderId);
+        log.info("Business {} fetching order {}", businessId, orderId);
 
         OrderResponse response = orderService.getOrderById(orderId, businessId);
 
@@ -108,7 +103,7 @@ public class BusinessOrderController {
             @RequestHeader("Authorization") String authHeader) {
 
         Long businessId = extractBusinessIdFromToken(authHeader);
-        logger.info("Business {} updating order {}", businessId, orderId);
+        log.info("Business {} updating order {}", businessId, orderId);
 
         OrderResponse response = orderService.updateOrder(orderId, request, businessId);
 
@@ -125,7 +120,7 @@ public class BusinessOrderController {
             @RequestHeader("Authorization") String authHeader) {
 
         Long businessId = extractBusinessIdFromToken(authHeader);
-        logger.info("Business {} deleting order {}", businessId, orderId);
+        log.info("Business {} deleting order {}", businessId, orderId);
 
         orderService.deleteOrder(orderId, businessId);
 
@@ -143,7 +138,7 @@ public class BusinessOrderController {
             @RequestHeader("Authorization") String authHeader) {
 
         Long businessId = extractBusinessIdFromToken(authHeader);
-        logger.info("Business {} cancelling order {} with reason: {}", businessId, orderId, reason);
+        log.info("Business {} cancelling order {} with reason: {}", businessId, orderId, reason);
 
         OrderResponse response = orderService.cancelOrder(orderId, businessId, reason);
 
@@ -159,7 +154,7 @@ public class BusinessOrderController {
             @RequestHeader("Authorization") String authHeader) {
 
         Long businessId = extractBusinessIdFromToken(authHeader);
-        logger.info("Business {} fetching order statistics", businessId);
+        log.info("Business {} fetching order statistics", businessId);
 
         BusinessOrderService.OrderStatistics stats = orderService.getOrderStatistics(businessId);
 
@@ -167,7 +162,7 @@ public class BusinessOrderController {
     }
 
     /**
-     * Extract business ID from JWT token
+     * Extract business ID from a JWT token
      */
     private Long extractBusinessIdFromToken(String authHeader) {
         String token = authHeader.substring(7); // Remove "Bearer " prefix
