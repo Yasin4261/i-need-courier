@@ -6,8 +6,7 @@ import com.api.demo.service.CourierAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +18,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth/register")
 @CrossOrigin(origins = "*")
 @Tag(name = "Registration", description = "User registration endpoints for Couriers and Businesses")
+@Slf4j
 public class RegistrationController {
-
-    private static final Logger logger = LoggerFactory.getLogger(RegistrationController.class);
 
     private final CourierAuthService courierAuthService;
     private final BusinessAuthService businessAuthService;
@@ -44,7 +42,7 @@ public class RegistrationController {
     public ResponseEntity<ApiResponse<CourierRegistrationResponse>> registerCourier(
             @Valid @RequestBody CourierRegistrationRequest request) {
 
-        logger.info("Courier registration request for: {}", request.getEmail());
+        log.info("Courier registration request for: {}", request.getEmail());
 
         CourierRegistrationResponse response = courierAuthService.register(request);
         return ResponseEntity.ok(ApiResponse.success(response, "Courier registration successful"));
@@ -63,7 +61,7 @@ public class RegistrationController {
     public ResponseEntity<ApiResponse<BusinessRegistrationResponse>> registerBusiness(
             @Valid @RequestBody BusinessRegistrationRequest request) {
 
-        logger.info("Business registration request for: {}", request.getName());
+        log.info("Business registration request for: {}", request.getName());
 
         BusinessRegistrationResponse response = businessAuthService.register(request);
         return ResponseEntity.ok(ApiResponse.success(response, "Business registration successful. Pending approval."));

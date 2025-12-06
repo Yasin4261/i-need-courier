@@ -5,7 +5,7 @@ package com.api.demo.model.enums;
  */
 public enum OrderPriority {
     NORMAL,   // Standard delivery
-    HIGH,     // High priority delivery
+    HIGH,     // High-priority delivery
     URGENT    // Urgent delivery (fastest)
 }
 

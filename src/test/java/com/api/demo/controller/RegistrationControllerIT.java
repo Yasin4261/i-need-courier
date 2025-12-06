@@ -1,6 +1,5 @@
 package com.api.demo.controller;
 
-import com.api.demo.config.container.TestContainersConfiguration;
 import com.api.demo.dto.BusinessRegistrationRequest;
 import com.api.demo.repository.BusinessRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,27 +8,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
-import org.testcontainers.postgresql.PostgreSQLContainer;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@Import(TestContainersConfiguration.class)
 @AutoConfigureMockMvc
-public class RegistrationControllerIT {
-
-    @Autowired
-    private PostgreSQLContainer postgres;
+public class RegistrationControllerIT extends AbstractIntegrationTest {
 
     @Autowired
     BusinessRepository businessRepository;

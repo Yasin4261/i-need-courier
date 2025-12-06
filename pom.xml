@@ -9,6 +9,7 @@
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
         <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
+        <archunit-junit5.version>1.4.1</archunit-junit5.version>
     </properties>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -125,6 +126,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Reduce boilerplate code -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Test-only dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -209,6 +217,14 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Allows enforcing architectural conventions via tests -->
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <version>${archunit-junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
