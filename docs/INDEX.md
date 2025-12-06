@@ -35,8 +35,10 @@ Welcome to the **I Need Courier** documentation! This guide will help you naviga
 - [Database for Backend](DATABASE_FOR_BACKEND.md) - Backend-specific DB info
 - [Database Graph](db_graph.png) - Visual schema diagram
 
-### 📅 Shift Management (NEW)
+### 📅 Shift Management
 - [Shift Management Guide](guides/SHIFT_MANAGEMENT_GUIDE.md) - Complete shift system guide
+- [On-Duty System](guides/ON_DUTY_SYSTEM.md) - **NEW** On-duty couriers tracking system
+- [On-Duty Test Guide](guides/ON_DUTY_TEST_GUIDE.md) - **NEW** Testing on-duty functionality
 - [Shift System Changelog](SHIFT_SYSTEM_CHANGELOG.md) - What's new in shift system
 - [Database Design](DATABASE_DESIGN.md#3-vardiya-yönetim-sistemi) - Shift tables and logic
 

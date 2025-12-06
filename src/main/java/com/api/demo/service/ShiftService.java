@@ -5,17 +5,16 @@ import com.api.demo.exception.BusinessException;
 import com.api.demo.model.Courier;
 import com.api.demo.model.Shift;
 import com.api.demo.model.ShiftTemplate;
-import com.api.demo.model.enums.ShiftRole;
 import com.api.demo.model.enums.ShiftStatus;
 import com.api.demo.repository.CourierRepository;
 import com.api.demo.repository.ShiftRepository;
 import com.api.demo.repository.ShiftTemplateRepository;
+import com.api.demo.service.OnDutyService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,13 +28,16 @@ public class ShiftService {
     private final ShiftRepository shiftRepository;
     private final ShiftTemplateRepository shiftTemplateRepository;
     private final CourierRepository courierRepository;
+    private final OnDutyService onDutyService;
 
     public ShiftService(ShiftRepository shiftRepository,
                        ShiftTemplateRepository shiftTemplateRepository,
-                       CourierRepository courierRepository) {
+                       CourierRepository courierRepository,
+                       OnDutyService onDutyService) {
         this.shiftRepository = shiftRepository;
         this.shiftTemplateRepository = shiftTemplateRepository;
         this.courierRepository = courierRepository;
+        this.onDutyService = onDutyService;
     }
 
     /**
@@ -165,7 +167,10 @@ public class ShiftService {
 
         Shift savedShift = shiftRepository.save(shift);
 
-        // Courier'ın on_duty_since alanını güncelle (sıra tabanlı atama için)
+        // Courier'ın on_duty bilgisini onDutyService üzerinden yönet
+        onDutyService.upsertOnDuty(courierId, shiftId);
+
+        // Ayrıca courier status'ünü güncelle
         Courier courier = courierRepository.findById(courierId)
                 .orElseThrow(() -> new BusinessException("Kurye bulunamadı"));
         courier.setOnDutySince(now);
@@ -205,6 +210,9 @@ public class ShiftService {
         }
 
         Shift savedShift = shiftRepository.save(shift);
+
+        // Courier'ın on_duty bilgisini kaldır (on_duty_couriers tablosundan sil)
+        onDutyService.removeOnDuty(courierId);
 
         // Courier'ın on_duty_since alanını temizle
         Courier courier = courierRepository.findById(courierId)
