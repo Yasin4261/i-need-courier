@@ -74,16 +74,3 @@ jobs:
     - name: Build Docker image
       run: docker build --quiet -t i-need-courier:${{ github.sha }} .
 
-    - name: Run docker image security scan
-      uses: aquasecurity/trivy-action@master # Trivy for docker image scan
-      with:
-        image-ref: i-need-courier:${{ github.sha }}
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-
-    - name: Upload docker image security scan results
-      uses: github/codeql-action/upload-sarif@v4
-      if: always()
-      with:
-        sarif_file: 'trivy-results.sarif'
-

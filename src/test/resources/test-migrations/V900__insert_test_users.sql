@@ -1,5 +1,18 @@
 -- V900__insert_test_users.sql
 -- password of hash: test123
+
+-- have an empty database during tests
+TRUNCATE TABLE public.orders CASCADE;
+TRUNCATE TABLE public.businesses CASCADE;
+TRUNCATE TABLE public.shift_templates;
+TRUNCATE TABLE public.shifts CASCADE;
+TRUNCATE TABLE public.coordinators CASCADE;
+TRUNCATE TABLE public.system_users CASCADE;
+
+-- Reset sequences due to previous inserts in migrations
+ALTER SEQUENCE businesses_id_seq RESTART WITH 1;
+
+-- A test user available in common
 INSERT INTO public.businesses (credit_limit, email_verified, is_active, latitude, longitude, created_at, id,
                                last_login_at, updated_at, verification_token_expires_at, phone, business_code,
                                business_type, contact_person, email, location_name, name, address, address_description,

@@ -2,27 +2,21 @@ package com.api.demo.controller;
 
 import com.api.demo.business.dto.OrderCreateRequest;
 import com.api.demo.business.dto.OrderResponse;
-import com.api.demo.config.container.TestContainersConfiguration;
 import com.api.demo.model.enums.OrderPriority;
 import com.api.demo.model.enums.OrderStatus;
 import com.api.demo.model.enums.PaymentType;
 import com.api.demo.repository.BusinessRepository;
 import com.api.demo.repository.OrderRepository;
 import com.api.demo.security.JwtTokenProvider;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
-import org.testcontainers.postgresql.PostgreSQLContainer;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
@@ -31,13 +25,8 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@Import(TestContainersConfiguration.class)
 @AutoConfigureMockMvc
-public class BusinessOrderControllerIT {
-
-    @Autowired
-    private PostgreSQLContainer postgres;
+public class BusinessOrderControllerIT extends AbstractIntegrationTest {
 
     @Autowired
     BusinessRepository businessRepository;
@@ -98,7 +87,6 @@ public class BusinessOrderControllerIT {
         expectedResponse.setEndCustomerPhone("+905551234567");
         expectedResponse.setEstimatedDeliveryTime(null);
         expectedResponse.setOrderId(4L);
-        expectedResponse.setOrderNumber("ORD-20251201-001");
         expectedResponse.setPackageCount(2);
         expectedResponse.setPackageDescription("2x Pizza Margherita");
         expectedResponse.setPackageWeight(BigDecimal.valueOf(1.5));
@@ -124,9 +112,10 @@ public class BusinessOrderControllerIT {
         var json = objectMapper.readTree(response.getResponse().getContentAsString());
         var actualDto = objectMapper.treeToValue(json.path("data"), OrderResponse.class);
         assertThat(actualDto).usingRecursiveComparison()
-                .ignoringFields("createdAt", "orderDate", "updatedAt")
+                .ignoringFields("createdAt", "orderDate", "updatedAt", "orderNumber")
                 .isEqualTo(expectedResponse);
         assertThat(json.path("code").asInt()).isEqualTo(200);
+        assertThat(actualDto.getOrderNumber()).matches("ORD-\\d{8}-\\d{3}");
         assertThat(response).hasStatus(HttpStatus.CREATED);
     }
 

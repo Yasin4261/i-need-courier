@@ -5,7 +5,6 @@ import com.api.demo.exception.BusinessException;
 import com.api.demo.model.Courier;
 import com.api.demo.model.Shift;
 import com.api.demo.model.ShiftTemplate;
-import com.api.demo.model.enums.ShiftRole;
 import com.api.demo.model.enums.ShiftStatus;
 import com.api.demo.repository.CourierRepository;
 import com.api.demo.repository.ShiftRepository;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +39,7 @@ public class ShiftService {
     /**
      * Mevcut tüm vardiya şablonlarını listele
      */
-    public List<ShiftTemplateDTO> getAvailableShiftTemplates() {
+    public List<ShiftTemplateDto> getAvailableShiftTemplates() {
         return shiftTemplateRepository.findByIsActiveTrueOrderByStartTimeAsc()
                 .stream()
                 .map(this::convertToTemplateDTO)
@@ -52,7 +50,7 @@ public class ShiftService {
      * Kurye için vardiya rezerve et
      */
     @Transactional
-    public ShiftDTO reserveShift(Long courierId, ReserveShiftRequest request) {
+    public ShiftDto reserveShift(Long courierId, ReserveShiftRequest request) {
         // Kurye kontrolü
         Courier courier = courierRepository.findById(courierId)
                 .orElseThrow(() -> new BusinessException("Kurye bulunamadı"));
@@ -95,7 +93,7 @@ public class ShiftService {
 
         Shift savedShift = shiftRepository.save(shift);
 
-        ShiftDTO dto = convertToDTO(savedShift);
+        ShiftDto dto = convertToDTO(savedShift);
         dto.setCourierName(courier.getName());
         return dto;
     }
@@ -103,7 +101,7 @@ public class ShiftService {
     /**
      * Kuryenin gelecek vardiyalarını listele
      */
-    public List<ShiftDTO> getUpcomingShifts(Long courierId) {
+    public List<ShiftDto> getUpcomingShifts(Long courierId) {
         List<Shift> shifts = shiftRepository.findUpcomingReservedShifts(courierId, LocalDateTime.now());
         return shifts.stream()
                 .map(this::convertToDTO)
@@ -113,7 +111,7 @@ public class ShiftService {
     /**
      * Kuryenin tüm vardiyalarını listele (filtre ile)
      */
-    public List<ShiftDTO> getCourierShifts(Long courierId, ShiftStatus status) {
+    public List<ShiftDto> getCourierShifts(Long courierId, ShiftStatus status) {
         List<Shift> shifts;
         if (status != null) {
             shifts = shiftRepository.findByCourierIdAndStatusOrderByStartTimeDesc(courierId, status);
@@ -133,7 +131,7 @@ public class ShiftService {
      * Vardiyaya check-in yap
      */
     @Transactional
-    public ShiftDTO checkIn(Long courierId, Long shiftId, CheckInRequest request) {
+    public ShiftDto checkIn(Long courierId, Long shiftId, CheckInRequest request) {
         // Vardiya kontrolü
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new BusinessException("Vardiya bulunamadı"));
@@ -172,7 +170,7 @@ public class ShiftService {
         courier.setStatus(Courier.CourierStatus.ONLINE);
         courierRepository.save(courier);
 
-        ShiftDTO dto = convertToDTO(savedShift);
+        ShiftDto dto = convertToDTO(savedShift);
         dto.setCourierName(courier.getName());
         return dto;
     }
@@ -181,7 +179,7 @@ public class ShiftService {
      * Vardiyadan check-out yap
      */
     @Transactional
-    public ShiftDTO checkOut(Long courierId, Long shiftId, CheckOutRequest request) {
+    public ShiftDto checkOut(Long courierId, Long shiftId, CheckOutRequest request) {
         // Vardiya kontrolü
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new BusinessException("Vardiya bulunamadı"));
@@ -213,7 +211,7 @@ public class ShiftService {
         courier.setStatus(Courier.CourierStatus.OFFLINE);
         courierRepository.save(courier);
 
-        ShiftDTO dto = convertToDTO(savedShift);
+        ShiftDto dto = convertToDTO(savedShift);
         dto.setCourierName(courier.getName());
         return dto;
     }
@@ -246,15 +244,15 @@ public class ShiftService {
     /**
      * Kuryenin aktif (CHECKED_IN) vardiyasını getir
      */
-    public ShiftDTO getActiveShift(Long courierId) {
+    public ShiftDto getActiveShift(Long courierId) {
         return shiftRepository.findByCourierIdAndStatus(courierId, ShiftStatus.CHECKED_IN)
                 .map(this::convertToDTO)
                 .orElse(null);
     }
 
     // DTO Dönüşüm metodları
-    private ShiftDTO convertToDTO(Shift shift) {
-        ShiftDTO dto = new ShiftDTO();
+    private ShiftDto convertToDTO(Shift shift) {
+        ShiftDto dto = new ShiftDto();
         dto.setShiftId(shift.getShiftId());
         dto.setCourierId(shift.getCourierId());
         dto.setStartTime(shift.getStartTime());
@@ -268,8 +266,8 @@ public class ShiftService {
         return dto;
     }
 
-    private ShiftTemplateDTO convertToTemplateDTO(ShiftTemplate template) {
-        ShiftTemplateDTO dto = new ShiftTemplateDTO();
+    private ShiftTemplateDto convertToTemplateDTO(ShiftTemplate template) {
+        ShiftTemplateDto dto = new ShiftTemplateDto();
         dto.setTemplateId(template.getTemplateId());
         dto.setName(template.getName());
         dto.setDescription(template.getDescription());

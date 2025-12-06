@@ -30,8 +30,8 @@ public class CourierShiftController {
      * GET /api/v1/courier/shifts/templates
      */
     @GetMapping("/templates")
-    public ResponseEntity<ApiResponse<List<ShiftTemplateDTO>>> getShiftTemplates() {
-        List<ShiftTemplateDTO> templates = shiftService.getAvailableShiftTemplates();
+    public ResponseEntity<ApiResponse<List<ShiftTemplateDto>>> getShiftTemplates() {
+        List<ShiftTemplateDto> templates = shiftService.getAvailableShiftTemplates();
         return ResponseEntity.ok(ApiResponse.success(templates, "Vardiya şablonları başarıyla getirildi"));
     }
 
@@ -40,12 +40,12 @@ public class CourierShiftController {
      * POST /api/v1/courier/shifts/reserve
      */
     @PostMapping("/reserve")
-    public ResponseEntity<ApiResponse<ShiftDTO>> reserveShift(
+    public ResponseEntity<ApiResponse<ShiftDto>> reserveShift(
             Authentication authentication,
             @Valid @RequestBody ReserveShiftRequest request) {
 
         Long courierId = extractCourierIdFromAuth(authentication);
-        ShiftDTO shift = shiftService.reserveShift(courierId, request);
+        ShiftDto shift = shiftService.reserveShift(courierId, request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(shift, "Vardiya başarıyla rezerve edildi"));
@@ -56,9 +56,9 @@ public class CourierShiftController {
      * GET /api/v1/courier/shifts/upcoming
      */
     @GetMapping("/upcoming")
-    public ResponseEntity<ApiResponse<List<ShiftDTO>>> getUpcomingShifts(Authentication authentication) {
+    public ResponseEntity<ApiResponse<List<ShiftDto>>> getUpcomingShifts(Authentication authentication) {
         Long courierId = extractCourierIdFromAuth(authentication);
-        List<ShiftDTO> shifts = shiftService.getUpcomingShifts(courierId);
+        List<ShiftDto> shifts = shiftService.getUpcomingShifts(courierId);
         return ResponseEntity.ok(ApiResponse.success(shifts, "Gelecek vardiyalar getirildi"));
     }
 
@@ -67,12 +67,12 @@ public class CourierShiftController {
      * GET /api/v1/courier/shifts/my-shifts?status=CHECKED_IN
      */
     @GetMapping("/my-shifts")
-    public ResponseEntity<ApiResponse<List<ShiftDTO>>> getMyCourierShifts(
+    public ResponseEntity<ApiResponse<List<ShiftDto>>> getMyCourierShifts(
             Authentication authentication,
             @RequestParam(required = false) ShiftStatus status) {
 
         Long courierId = extractCourierIdFromAuth(authentication);
-        List<ShiftDTO> shifts = shiftService.getCourierShifts(courierId, status);
+        List<ShiftDto> shifts = shiftService.getCourierShifts(courierId, status);
         return ResponseEntity.ok(ApiResponse.success(shifts, "Vardiyalar başarıyla getirildi"));
     }
 
@@ -81,9 +81,9 @@ public class CourierShiftController {
      * GET /api/v1/courier/shifts/active
      */
     @GetMapping("/active")
-    public ResponseEntity<ApiResponse<ShiftDTO>> getActiveShift(Authentication authentication) {
+    public ResponseEntity<ApiResponse<ShiftDto>> getActiveShift(Authentication authentication) {
         Long courierId = extractCourierIdFromAuth(authentication);
-        ShiftDTO shift = shiftService.getActiveShift(courierId);
+        ShiftDto shift = shiftService.getActiveShift(courierId);
 
         if (shift == null) {
             return ResponseEntity.ok(ApiResponse.success(null, "Aktif vardiya bulunamadı"));
@@ -97,7 +97,7 @@ public class CourierShiftController {
      * POST /api/v1/courier/shifts/{shiftId}/check-in
      */
     @PostMapping("/{shiftId}/check-in")
-    public ResponseEntity<ApiResponse<ShiftDTO>> checkIn(
+    public ResponseEntity<ApiResponse<ShiftDto>> checkIn(
             Authentication authentication,
             @PathVariable Long shiftId,
             @RequestBody(required = false) CheckInRequest request) {
@@ -108,7 +108,7 @@ public class CourierShiftController {
             request = new CheckInRequest();
         }
 
-        ShiftDTO shift = shiftService.checkIn(courierId, shiftId, request);
+        ShiftDto shift = shiftService.checkIn(courierId, shiftId, request);
         return ResponseEntity.ok(ApiResponse.success(shift, "Vardiyaya giriş başarılı"));
     }
 
@@ -117,7 +117,7 @@ public class CourierShiftController {
      * POST /api/v1/courier/shifts/{shiftId}/check-out
      */
     @PostMapping("/{shiftId}/check-out")
-    public ResponseEntity<ApiResponse<ShiftDTO>> checkOut(
+    public ResponseEntity<ApiResponse<ShiftDto>> checkOut(
             Authentication authentication,
             @PathVariable Long shiftId,
             @RequestBody(required = false) CheckOutRequest request) {
@@ -128,7 +128,7 @@ public class CourierShiftController {
             request = new CheckOutRequest();
         }
 
-        ShiftDTO shift = shiftService.checkOut(courierId, shiftId, request);
+        ShiftDto shift = shiftService.checkOut(courierId, shiftId, request);
         return ResponseEntity.ok(ApiResponse.success(shift, "Vardiyadan çıkış başarılı"));
     }
 

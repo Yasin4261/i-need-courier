@@ -1,17 +1,16 @@
 package com.api.demo.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,26 +18,28 @@ import java.util.Map;
  * Handles unauthorized access attempts
  */
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationEntryPoint.class);
+    private final JsonMapper mapper;
 
     @Override
     public void commence(HttpServletRequest request,
-                        HttpServletResponse response,
-                        AuthenticationException authException) throws IOException, ServletException {
+                         HttpServletResponse response,
+                         AuthenticationException authException) throws IOException, ServletException {
 
-        logger.error("Unauthorized error: {}", authException.getMessage());
+        log.error("Unauthorized error: {}", authException.getMessage());
 
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("success", false);
-        data.put("message", "Unauthorized: " + authException.getMessage());
-        data.put("path", request.getServletPath());
+        var data = Map.of(
+                "success", false,
+                "message", "Unauthorized: " + authException.getMessage(),
+                "path", request.getServletPath()
+        );
 
-        ObjectMapper mapper = new ObjectMapper();
         response.getWriter().write(mapper.writeValueAsString(data));
     }
 }

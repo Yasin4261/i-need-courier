@@ -1,5 +1,9 @@
 package com.api.demo.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +12,12 @@ import java.util.List;
  * Detailed error response for validation and other errors.
  * Provides consistent and informative error structure.
  */
+@Setter
+@Getter
+@ToString
 public class ErrorResponse {
 
+    // Getters and Setters
     private int status;
     private String error;
     private String message;
@@ -37,94 +45,10 @@ public class ErrorResponse {
         validationErrors.add(new ValidationError(field, message));
     }
 
-    // Getters and Setters
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public List<ValidationError> getValidationErrors() {
-        return validationErrors;
-    }
-
-    public void setValidationErrors(List<ValidationError> validationErrors) {
-        this.validationErrors = validationErrors;
-    }
-
     /**
      * Inner class for validation error details.
      */
-    public static class ValidationError {
-        private String field;
-        private String message;
-
-        public ValidationError(String field, String message) {
-            this.field = field;
-            this.message = message;
-        }
-
-        public String getField() {
-            return field;
-        }
-
-        public void setField(String field) {
-            this.field = field;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "ErrorResponse{" +
-                "status=" + status +
-                ", error='" + error + '\'' +
-                ", message='" + message + '\'' +
-                ", path='" + path + '\'' +
-                ", timestamp=" + timestamp +
-                ", validationErrors=" + validationErrors +
-                '}';
+    public static record ValidationError(String field, String message) {
     }
 }
 
