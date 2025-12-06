@@ -227,9 +227,14 @@ docker compose up -d postgres
 ```bash
 # application.properties veya environment
 SERVER_PORT=8080
-DATABASE_URL=jdbc:postgresql://localhost:5432/courier_db
+-DATABASE_URL=jdbc:postgresql://localhost:5432/courier_db
+-DATABASE_USERNAME=courier_user
+-DATABASE_PASSWORD=courier_pass
+
+# Updated to match compose.yaml
+DATABASE_URL=jdbc:postgresql://localhost:5433/courier_db
 DATABASE_USERNAME=courier_user
-DATABASE_PASSWORD=courier_pass
+DATABASE_PASSWORD=courier_password
 JWT_SECRET=your-secret-key-change-in-production
 JWT_EXPIRATION_HOURS=24
 ```
@@ -520,4 +525,3 @@ Bu proje [MIT](LICENSE) lisansı altında lisanslanmıştır.
 Made with ❤️ using Clean Architecture
 
 </div>
-

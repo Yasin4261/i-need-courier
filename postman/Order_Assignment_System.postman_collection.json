@@ -1,0 +1,488 @@
+{
+  "info": {
+    "name": "Order Assignment System - FIFO + WebSocket + Timeout",
+    "_postman_id": "order-assignment-system",
+    "description": "Sipariş atama sistemi test collection'ı. FIFO sıralama, kurye onayı, WebSocket bildirimleri ve timeout mekanizması testleri.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Business Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Token exists\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.token).to.exist;",
+                  "    pm.environment.set(\"business_token\", jsonData.data.token);",
+                  "    pm.environment.set(\"business_id\", jsonData.data.businessId || jsonData.data.userId);",
+                  "    console.log(\"Business Token saved:\", jsonData.data.token.substring(0, 20) + \"...\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"yasin3@pako.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Business kullanıcısı ile giriş yap ve token al"
+          },
+          "response": []
+        },
+        {
+          "name": "Courier Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Token exists\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.token).to.exist;",
+                  "    pm.environment.set(\"courier_token\", jsonData.data.token);",
+                  "    pm.environment.set(\"courier_id\", jsonData.data.courierId || jsonData.data.userId);",
+                  "    console.log(\"Courier Token saved:\", jsonData.data.token.substring(0, 20) + \"...\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"yasin3@pako.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Kurye ile giriş yap ve token al"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Shift Management (Prerequisites)",
+      "item": [
+        {
+          "name": "Get Shift Templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courier_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/courier/shifts/templates",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "courier", "shifts", "templates"]
+            },
+            "description": "Vardiya şablonlarını listele"
+          },
+          "response": []
+        },
+        {
+          "name": "Reserve Shift (Tomorrow)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Shift reserved\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.shiftId) {",
+                  "        pm.environment.set(\"shift_id\", jsonData.data.shiftId);",
+                  "        console.log(\"Shift ID:\", jsonData.data.shiftId);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Calculate tomorrow's date",
+                  "const tomorrow = new Date();",
+                  "tomorrow.setDate(tomorrow.getDate() + 1);",
+                  "const dateStr = tomorrow.toISOString().split('T')[0];",
+                  "pm.environment.set(\"tomorrow_date\", dateStr);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courier_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"templateId\": 1,\n  \"shiftDate\": \"{{tomorrow_date}}\",\n  \"notes\": \"Test reservation for order assignment\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/courier/shifts/reserve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "courier", "shifts", "reserve"]
+            },
+            "description": "Yarın için vardiya rezerve et"
+          },
+          "response": []
+        },
+        {
+          "name": "Check-In to Shift (Manual DB)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "-- Manuel check-in için SQL (Docker psql ile çalıştır)\n-- docker exec courier-postgres psql -U courier_user -d courier_db -c \"\nUPDATE shifts SET status='CHECKED_IN', check_in_time=now() WHERE shift_id = {{shift_id}};\nINSERT INTO on_duty_couriers (courier_id, shift_id, on_duty_since, source) \nVALUES ({{courier_id}}, {{shift_id}}, now(), 'manual_test') \nON CONFLICT (courier_id) DO UPDATE SET shift_id={{shift_id}}, on_duty_since=now();\n-- \""
+            },
+            "url": {
+              "raw": "",
+              "host": [""]
+            },
+            "description": "⚠️ Bu manuel SQL - Docker ile çalıştır veya check-in endpoint'i kullan"
+          },
+          "response": []
+        }
+      ],
+      "description": "Sipariş atama için en az 1 kurye on-duty olmalı"
+    },
+    {
+      "name": "3. Order Assignment - FIFO",
+      "item": [
+        {
+          "name": "Create Order (Auto-Assign)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Order created\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.exist;",
+                  "    if (jsonData.data.orderId) {",
+                  "        pm.environment.set(\"order_id\", jsonData.data.orderId);",
+                  "        console.log(\"Order ID:\", jsonData.data.orderId);",
+                  "    }",
+                  "    if (jsonData.data.assignmentId) {",
+                  "        pm.environment.set(\"assignment_id\", jsonData.data.assignmentId);",
+                  "        console.log(\"Assignment ID:\", jsonData.data.assignmentId);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"Auto-assigned to courier\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.assignedCourierId || jsonData.data.courierId).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{business_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"endCustomerName\": \"Test Müşteri\",\n  \"endCustomerPhone\": \"+905551234567\",\n  \"pickupAddress\": \"Beşiktaş Meydanı, Beşiktaş/İstanbul\",\n  \"deliveryAddress\": \"Kadıköy İskelesi, Kadıköy/İstanbul\",\n  \"packageDescription\": \"Pizza (2 adet, sıcak)\",\n  \"packageCount\": 2,\n  \"packageWeight\": 1.5,\n  \"deliveryFee\": 50.00,\n  \"paymentType\": \"CASH\",\n  \"businessNotes\": \"Ekstra ketçap mayonez var\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/business/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "business", "orders"]
+            },
+            "description": "Business sipariş oluşturur, sistem otomatik olarak FIFO sırasındaki kuryeye atar"
+          },
+          "response": []
+        },
+        {
+          "name": "Check On-Duty Couriers (DB)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "",
+              "host": [""]
+            },
+            "description": "SQL: docker exec courier-postgres psql -U courier_user -d courier_db -c \"SELECT od.courier_id, c.name, od.on_duty_since FROM on_duty_couriers od JOIN couriers c ON c.id=od.courier_id ORDER BY od.on_duty_since ASC;\""
+          },
+          "response": []
+        }
+      ],
+      "description": "FIFO bazlı otomatik atama testleri"
+    },
+    {
+      "name": "4. Courier - Assignment Actions",
+      "item": [
+        {
+          "name": "Get Pending Assignments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Pending assignments exist\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "    if (jsonData.data.length > 0) {",
+                  "        console.log(\"Found\", jsonData.data.length, \"pending assignment(s)\");",
+                  "        pm.environment.set(\"assignment_id\", jsonData.data[0].assignmentId || jsonData.data[0].id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courier_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/courier/assignments/pending",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "courier", "assignments", "pending"]
+            },
+            "description": "Kurye bekleyen atamalarını görür (WebSocket bildirimi aldıktan sonra)"
+          },
+          "response": []
+        },
+        {
+          "name": "Accept Assignment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Assignment accepted\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.include(\"kabul\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courier_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/courier/assignments/{{assignment_id}}/accept",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v1",
+                "courier",
+                "assignments",
+                "{{assignment_id}}",
+                "accept"
+              ]
+            },
+            "description": "Kurye atamayı kabul eder. Order status → ASSIGNED, kurye sıranın sonuna gider"
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Assignment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Assignment rejected\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.include(\"red\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courier_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Araç arızalı, şu an teslimat yapamıyorum\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/courier/assignments/{{assignment_id}}/reject",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v1",
+                "courier",
+                "assignments",
+                "{{assignment_id}}",
+                "reject"
+              ]
+            },
+            "description": "Kurye atamayı reddeder. Sistem otomatik olarak bir sonraki kuryeye atar (REASSIGNMENT)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Kurye kabul/red işlemleri"
+    },
+    {
+      "name": "5. Database Queries (Manual)",
+      "item": [
+        {
+          "name": "Query: Order Assignments History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "",
+              "host": [""]
+            },
+            "description": "SQL:\ndocker exec courier-postgres psql -U courier_user -d courier_db -c \"\nSELECT \n    oa.id, oa.order_id, oa.courier_id, \n    c.name AS courier_name,\n    oa.status, oa.assignment_type,\n    oa.assigned_at, oa.response_at,\n    oa.rejection_reason\nFROM order_assignments oa\nJOIN couriers c ON c.id = oa.courier_id\nWHERE oa.order_id = {{order_id}}\nORDER BY oa.assigned_at DESC;\n\""
+          },
+          "response": []
+        },
+        {
+          "name": "Query: Timeout Assignments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "",
+              "host": [""]
+            },
+            "description": "SQL:\ndocker exec courier-postgres psql -U courier_user -d courier_db -c \"\nSELECT \n    oa.id, oa.order_id, oa.courier_id,\n    oa.assigned_at, oa.timeout_at,\n    NOW() - oa.timeout_at AS exceeded_by\nFROM order_assignments oa\nWHERE oa.status = 'TIMEOUT'\nORDER BY oa.timeout_at DESC\nLIMIT 10;\n\""
+          },
+          "response": []
+        },
+        {
+          "name": "Query: Courier Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "",
+              "host": [""]
+            },
+            "description": "SQL:\ndocker exec courier-postgres psql -U courier_user -d courier_db -c \"\nSELECT \n    c.id, c.name,\n    COUNT(*) FILTER (WHERE oa.status = 'ACCEPTED') AS accepted,\n    COUNT(*) FILTER (WHERE oa.status = 'REJECTED') AS rejected,\n    COUNT(*) FILTER (WHERE oa.status = 'TIMEOUT') AS timeouts,\n    ROUND(100.0 * COUNT(*) FILTER (WHERE oa.status = 'ACCEPTED') / \n          NULLIF(COUNT(*), 0), 2) AS acceptance_rate\nFROM couriers c\nLEFT JOIN order_assignments oa ON oa.courier_id = c.id\nGROUP BY c.id, c.name\nORDER BY acceptance_rate DESC;\n\""
+          },
+          "response": []
+        }
+      ],
+      "description": "Manuel SQL sorguları (Docker psql ile)"
+    },
+    {
+      "name": "6. WebSocket Test (External)",
+      "item": [
+        {
+          "name": "WebSocket Connection Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "",
+              "host": [""]
+            },
+            "description": "WebSocket Test:\n\n1. HTML sayfası aç veya Chrome Extension kullan\n2. Endpoint: ws://localhost:8081/ws\n3. Protocol: STOMP over SockJS\n\nJavaScript Örnek:\n```javascript\nconst socket = new SockJS('http://localhost:8081/ws');\nconst stompClient = Stomp.over(socket);\n\nstompClient.connect({}, function(frame) {\n    console.log('Connected:', frame);\n    \n    // Kurye bildirimleri\n    stompClient.subscribe('/queue/courier/4/assignments', function(msg) {\n        const data = JSON.parse(msg.body);\n        console.log('NEW ASSIGNMENT:', data);\n        alert('Yeni sipariş: ' + data.assignmentId);\n    });\n    \n    // Business bildirimleri\n    stompClient.subscribe('/queue/business/1/orders', function(msg) {\n        const data = JSON.parse(msg.body);\n        console.log('ORDER STATUS:', data);\n    });\n});\n```\n\nBildirimleri test etmek için:\n1. WebSocket bağlan\n2. Postman'den sipariş oluştur\n3. Console'da bildirim geldiğini gör"
+          },
+          "response": []
+        }
+      ],
+      "description": "WebSocket testleri (Postman dışında - HTML/JS ile)"
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8081",
+      "type": "string"
+    }
+  ]
+}
+

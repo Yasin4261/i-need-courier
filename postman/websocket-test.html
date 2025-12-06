@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Assignment WebSocket Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .status.disconnected {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .status.connected {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        button.danger {
+            background: #f44336;
+        }
+        button.danger:hover {
+            background: #da190b;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100px;
+            margin-right: 10px;
+        }
+        .notification {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .notification.new-assignment {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+        }
+        .notification.timeout {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+        .notification.order-status {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+        }
+        .notification h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .notification p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .notification strong {
+            color: #333;
+        }
+        #notifications {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .clear-btn {
+            background: #ff9800;
+        }
+        .clear-btn:hover {
+            background: #f57c00;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #1976D2;
+        }
+        .timestamp {
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Order Assignment WebSocket Test</h1>
+
+    <div class="container">
+        <h2>📡 Bağlantı Durumu</h2>
+        <div id="status" class="status disconnected">Bağlantı Yok</div>
+
+        <div style="margin-top: 15px;">
+            <label>Kurye ID:</label>
+            <input type="number" id="courierId" value="4" placeholder="Courier ID">
+
+            <label>Business ID:</label>
+            <input type="number" id="businessId" value="1" placeholder="Business ID">
+
+            <button id="connectBtn" onclick="connect()">Bağlan</button>
+            <button id="disconnectBtn" onclick="disconnect()" disabled class="danger">Bağlantıyı Kes</button>
+        </div>
+    </div>
+
+    <div class="container info-box">
+        <h3>ℹ️ Kullanım Talimatları</h3>
+        <ol>
+            <li>Kurye ID ve Business ID'yi gir</li>
+            <li>"Bağlan" butonuna tıkla</li>
+            <li>Postman'den sipariş oluştur: <code>POST /api/v1/business/orders</code></li>
+            <li>Aşağıda bildirimleri gör</li>
+            <li>2 dakika bekle ve timeout bildirimini izle</li>
+        </ol>
+        <p><strong>WebSocket Endpoint:</strong> <code>ws://localhost:8081/ws</code></p>
+        <p><strong>Protocol:</strong> STOMP over SockJS</p>
+    </div>
+
+    <div class="container">
+        <h2>📬 Bildirimler</h2>
+        <button onclick="clearNotifications()" class="clear-btn">Bildirimleri Temizle</button>
+        <div id="notifications"></div>
+        <div id="noNotifications" style="color: #999; text-align: center; padding: 40px;">
+            Henüz bildirim yok. Bağlan ve sipariş oluştur.
+        </div>
+    </div>
+
+    <script>
+        let stompClient = null;
+        let socket = null;
+
+        function setConnected(connected) {
+            document.getElementById('connectBtn').disabled = connected;
+            document.getElementById('disconnectBtn').disabled = !connected;
+            document.getElementById('courierId').disabled = connected;
+            document.getElementById('businessId').disabled = connected;
+
+            const statusDiv = document.getElementById('status');
+            if (connected) {
+                statusDiv.textContent = '✅ Bağlı';
+                statusDiv.className = 'status connected';
+            } else {
+                statusDiv.textContent = '❌ Bağlantı Yok';
+                statusDiv.className = 'status disconnected';
+            }
+        }
+
+        function connect() {
+            const courierId = document.getElementById('courierId').value;
+            const businessId = document.getElementById('businessId').value;
+
+            if (!courierId || !businessId) {
+                alert('Lütfen Kurye ID ve Business ID girin');
+                return;
+            }
+
+            socket = new SockJS('http://localhost:8081/ws');
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                setConnected(true);
+                addSystemNotification('Bağlantı kuruldu', 'WebSocket sunucusuna başarıyla bağlandı');
+
+                // Kurye bildirimleri
+                stompClient.subscribe('/queue/courier/' + courierId + '/assignments', function(message) {
+                    const notification = JSON.parse(message.body);
+                    console.log('Courier notification:', notification);
+                    handleCourierNotification(notification);
+                });
+
+                // Business bildirimleri
+                stompClient.subscribe('/queue/business/' + businessId + '/orders', function(message) {
+                    const notification = JSON.parse(message.body);
+                    console.log('Business notification:', notification);
+                    handleBusinessNotification(notification);
+                });
+
+            }, function(error) {
+                console.error('Connection error:', error);
+                setConnected(false);
+                addSystemNotification('Bağlantı Hatası', 'WebSocket bağlantısı kurulamadı: ' + error, true);
+            });
+        }
+
+        function disconnect() {
+            if (stompClient !== null) {
+                stompClient.disconnect();
+            }
+            setConnected(false);
+            addSystemNotification('Bağlantı Kesildi', 'WebSocket bağlantısı kapatıldı');
+            console.log('Disconnected');
+        }
+
+        function handleCourierNotification(notification) {
+            const notifDiv = document.createElement('div');
+
+            if (notification.type === 'NEW_ASSIGNMENT') {
+                notifDiv.className = 'notification new-assignment';
+                notifDiv.innerHTML = `
+                    <h3>🆕 Yeni Sipariş Atandı!</h3>
+                    <p><strong>Assignment ID:</strong> ${notification.assignmentId}</p>
+                    <p><strong>Order ID:</strong> ${notification.orderId}</p>
+                    <p><strong>Atanma Zamanı:</strong> ${formatDate(notification.assignedAt)}</p>
+                    <p><strong>Timeout:</strong> ${formatDate(notification.timeoutAt)}</p>
+                    <hr>
+                    <p><strong>📍 Alış:</strong> ${notification.orderDetails.pickupAddress}</p>
+                    <p><strong>📍 Teslim:</strong> ${notification.orderDetails.deliveryAddress}</p>
+                    <p><strong>📦 Paket:</strong> ${notification.orderDetails.packageDescription}</p>
+                    <p><strong>💰 Ücret:</strong> ${notification.orderDetails.deliveryFee} TL</p>
+                    <p><strong>👤 Müşteri:</strong> ${notification.orderDetails.endCustomerName}</p>
+                    <p class="timestamp">${new Date().toLocaleString('tr-TR')}</p>
+                `;
+                playSound();
+            } else if (notification.type === 'ASSIGNMENT_TIMEOUT') {
+                notifDiv.className = 'notification timeout';
+                notifDiv.innerHTML = `
+                    <h3>⏰ Atama Zaman Aşımı</h3>
+                    <p><strong>Assignment ID:</strong> ${notification.assignmentId}</p>
+                    <p><strong>Mesaj:</strong> ${notification.message}</p>
+                    <p class="timestamp">${new Date().toLocaleString('tr-TR')}</p>
+                `;
+            }
+
+            const container = document.getElementById('notifications');
+            container.insertBefore(notifDiv, container.firstChild);
+            document.getElementById('noNotifications').style.display = 'none';
+        }
+
+        function handleBusinessNotification(notification) {
+            const notifDiv = document.createElement('div');
+            notifDiv.className = 'notification order-status';
+            notifDiv.innerHTML = `
+                <h3>📊 Sipariş Durumu Güncellendi</h3>
+                <p><strong>Order ID:</strong> ${notification.orderId}</p>
+                <p><strong>Durum:</strong> ${notification.status}</p>
+                <p><strong>Mesaj:</strong> ${notification.message}</p>
+                <p class="timestamp">${new Date().toLocaleString('tr-TR')}</p>
+            `;
+
+            const container = document.getElementById('notifications');
+            container.insertBefore(notifDiv, container.firstChild);
+            document.getElementById('noNotifications').style.display = 'none';
+        }
+
+        function addSystemNotification(title, message, isError = false) {
+            const notifDiv = document.createElement('div');
+            notifDiv.className = 'notification ' + (isError ? 'timeout' : 'order-status');
+            notifDiv.innerHTML = `
+                <h3>${isError ? '⚠️' : 'ℹ️'} ${title}</h3>
+                <p>${message}</p>
+                <p class="timestamp">${new Date().toLocaleString('tr-TR')}</p>
+            `;
+
+            const container = document.getElementById('notifications');
+            container.insertBefore(notifDiv, container.firstChild);
+            document.getElementById('noNotifications').style.display = 'none';
+        }
+
+        function clearNotifications() {
+            document.getElementById('notifications').innerHTML = '';
+            document.getElementById('noNotifications').style.display = 'block';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleString('tr-TR');
+        }
+
+        function playSound() {
+            // Basit bir ses efekti (tarayıcı destekliyorsa)
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2);
+        }
+
+        // Sayfa yüklendiğinde otomatik bağlan (isteğe bağlı)
+        // window.onload = function() {
+        //     setTimeout(connect, 500);
+        // };
+    </script>
+</body>
+</html>
+

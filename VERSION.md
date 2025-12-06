@@ -1,8 +1,93 @@
 # Version History - I Need Courier
 
-## Current Version: v1.3.0
+## Current Version: v1.9.0
 
-**Release Date:** November 14, 2025
+**Release Date:** December 6, 2025
+
+---
+
+## Version 1.9.0 (December 6, 2025)
+
+### 📂 Project Organization & Documentation
+- ✅ **Comprehensive Documentation** - 15+ documentation files
+- ✅ **PROJECT_STRUCTURE.md** - Complete project organization guide
+- ✅ **Organized Structure** - docs/reports/, docs/fixes/, docs/flows/
+- ✅ **Test Scripts** - Moved to scripts/tests/ directory
+- ✅ **Clean Root Directory** - Removed 8 obsolete files
+- ✅ **26 Files Reorganized** - Professional project structure
+
+---
+
+## Version 1.8.0 (December 6, 2025)
+
+### 📡 WebSocket & Real-time Notifications
+- ✅ **WebSocket Configuration** - STOMP protocol support
+- ✅ **WebSocketNotificationService** - Real-time assignment notifications
+- ✅ **Instant Notifications** - Couriers notified immediately on assignment
+- ✅ **Subscription Endpoint** - `/topic/assignments/{courierId}`
+
+---
+
+## Version 1.7.0 (December 6, 2025)
+
+### 🔧 Exception Handling & Logging
+- ✅ **5 Custom Exceptions** - Proper HTTP status codes
+  - `NoCourierAvailableException` (503)
+  - `AssignmentNotFoundException` (404)
+  - `AssignmentNotOwnedException` (403)
+  - `AssignmentExpiredException` (410)
+  - `InvalidAssignmentStatusException` (409)
+- ✅ **Detailed Logging** - DEBUG, INFO, ERROR levels
+- ✅ **Request/Response Logging** - All endpoints tracked
+- ✅ **Enhanced Error Messages** - Context-rich error responses
+
+---
+
+## Version 1.6.0 (December 6, 2025)
+
+### 🚚 Delivery Flow System
+- ✅ **3 Delivery Endpoints**
+  - `POST /api/v1/courier/orders/{id}/pickup` - Mark as picked up
+  - `POST /api/v1/courier/orders/{id}/start-delivery` - Start transit
+  - `POST /api/v1/courier/orders/{id}/complete` - Complete with notes/amount
+- ✅ **Complete Workflow** - ASSIGNED → PICKED_UP → IN_TRANSIT → DELIVERED
+- ✅ **Flexible Parameters** - Query params, form data, JSON support
+- ✅ **Optional Fields** - Notes and collection amount tracking
+
+### 🐛 Bug Fixes
+- ✅ Fixed "Bu sipariş size atanmamış" error
+- ✅ Fixed order.courier NULL issue
+- ✅ Fixed 415 Unsupported Media Type error
+
+---
+
+## Version 1.5.0 (December 6, 2025)
+
+### 📋 Order Assignment System
+- ✅ **FIFO Queue Algorithm** - Automatic order assignment
+- ✅ **3 Assignment Endpoints**
+  - `GET /api/v1/courier/assignments/pending`
+  - `POST /api/v1/courier/assignments/{id}/accept`
+  - `POST /api/v1/courier/assignments/{id}/reject`
+- ✅ **4-minute Timeout** - Auto-reassignment mechanism
+- ✅ **order_assignments Table** - Assignment history tracking
+- ✅ **Assignment Enums** - Status and Type tracking
+
+### 🐛 Bug Fixes
+- ✅ Fixed duplicate assignment creation
+- ✅ Fixed timeout filter in queries
+
+---
+
+## Version 1.4.0 (December 6, 2025)
+
+### 👔 On-Duty Courier Management
+- ✅ **2 On-Duty Endpoints**
+  - `POST /api/v1/courier/shifts/{id}/check-in` - Go on-duty
+  - `POST /api/v1/courier/shifts/check-out` - Go off-duty
+- ✅ **FIFO Queue** - on_duty_couriers table
+- ✅ **Real-time Tracking** - Active courier status
+- ✅ **OnDutyService** - Queue management logic
 
 ---
 
