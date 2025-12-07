@@ -469,17 +469,17 @@ class CourierAuthControllerIntegrationTest {
 - Read this guide thoroughly
 - Ask questions in code reviews
 - Consult with team members
-package com.api.demo.service;
+  package com.api.pako.service;
 
-import com.api.demo.dto.CourierLoginRequest;
-import com.api.demo.dto.CourierLoginResponse;
-import com.api.demo.dto.CourierRegistrationRequest;
-import com.api.demo.dto.CourierRegistrationResponse;
-import com.api.demo.exception.CourierAlreadyExistsException;
-import com.api.demo.exception.InvalidCredentialsException;
-import com.api.demo.model.Courier;
-import com.api.demo.repository.CourierRepository;
-import com.api.demo.security.JwtTokenProvider;
+import com.api.pako.dto.CourierLoginRequest;
+import com.api.pako.dto.CourierLoginResponse;
+import com.api.pako.dto.CourierRegistrationRequest;
+import com.api.pako.dto.CourierRegistrationResponse;
+import com.api.pako.exception.CourierAlreadyExistsException;
+import com.api.pako.exception.InvalidCredentialsException;
+import com.api.pako.model.Courier;
+import com.api.pako.repository.CourierRepository;
+import com.api.pako.security.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
