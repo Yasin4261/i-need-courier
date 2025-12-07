@@ -1,10 +1,12 @@
 package com.api.demo.exception;
 
 import com.api.demo.model.enums.AssignmentStatus;
+import lombok.Getter;
 
 /**
  * Exception thrown when assignment is in invalid status for the operation
  */
+@Getter
 public class InvalidAssignmentStatusException extends RuntimeException {
 
     private final Long assignmentId;
@@ -23,18 +25,6 @@ public class InvalidAssignmentStatusException extends RuntimeException {
         this.assignmentId = assignmentId;
         this.currentStatus = currentStatus;
         this.expectedStatus = null;
-    }
-
-    public Long getAssignmentId() {
-        return assignmentId;
-    }
-
-    public AssignmentStatus getCurrentStatus() {
-        return currentStatus;
-    }
-
-    public AssignmentStatus getExpectedStatus() {
-        return expectedStatus;
     }
 }
 
