@@ -7,6 +7,161 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.9.0] - 2025-12-06
+
+### Added
+- **Project Organization & Documentation**
+  - `PROJECT_STRUCTURE.md` - Complete project organization guide
+  - `COURIER_ORDER_FLOW.md` - Detailed delivery flow documentation
+  - `WHY_START_DELIVERY_EXISTS.md` - Design decision explanations
+  - `DEBUG_PICKUP_ISSUE.md` - Comprehensive troubleshooting guide
+  - Organized documentation into `docs/reports/`, `docs/fixes/`, `docs/flows/`
+  - Test scripts moved to `scripts/tests/`
+  - 15+ documentation files created/reorganized
+
+### Changed
+- Reorganized 26 files from root directory into proper subdirectories
+- Updated all documentation with current system state
+- Enhanced README with clear project structure
+
+### Removed
+- 8 obsolete files (fix-flyway.sh, flyway-repair-guide.sh, migration.sh, github-push.sh, etc.)
+- Old/unused test scripts from root directory
+- Redundant documentation files
+
+---
+
+## [1.8.0] - 2025-12-06
+
+### Added
+- **WebSocket & Real-time Notifications**
+  - WebSocket configuration for real-time communication
+  - `WebSocketNotificationService` for assignment notifications
+  - Real-time order assignment notifications to couriers
+  - STOMP messaging protocol support
+  - `/topic/assignments/{courierId}` subscription endpoint
+
+### Changed
+- Enhanced assignment flow with instant courier notifications
+- Improved user experience with real-time updates
+
+---
+
+## [1.7.0] - 2025-12-06
+
+### Added
+- **Custom Exception System**
+  - `NoCourierAvailableException` (503) - No courier available for assignment
+  - `AssignmentNotFoundException` (404) - Assignment not found
+  - `AssignmentNotOwnedException` (403) - Unauthorized assignment access
+  - `AssignmentExpiredException` (410) - Assignment timeout
+  - `InvalidAssignmentStatusException` (409) - Invalid status transition
+  
+- **Enhanced Logging System**
+  - DEBUG level logs for development
+  - INFO level logs for operations
+  - ERROR level logs with detailed context
+  - Request/Response logging for all endpoints
+  - Assignment flow tracking
+
+### Changed
+- Replaced generic `RuntimeException` with specific custom exceptions
+- Improved HTTP status code accuracy (403, 404, 410, 503 instead of 500)
+- Enhanced error messages with detailed context
+- Better exception handling in GlobalExceptionHandler
+
+### Fixed
+- Proper HTTP status codes for different error scenarios
+- Improved debugging with detailed error context
+
+---
+
+## [1.6.0] - 2025-12-06
+
+### Added
+- **Delivery Flow System**
+  - POST `/api/v1/courier/orders/{id}/pickup` – Mark order as picked up
+  - POST `/api/v1/courier/orders/{id}/start-delivery` – Start delivery (in transit)
+  - POST `/api/v1/courier/orders/{id}/complete` – Complete delivery with notes and collection amount
+  - Complete order status workflow (ASSIGNED → PICKED_UP → IN_TRANSIT → DELIVERED)
+  - Optional notes and collection amount tracking
+  - Flexible parameter handling (query params, form data, JSON)
+
+### Changed
+- Added `consumes = {"*/*"}` for better content-type support
+- Enhanced CourierOrderController with detailed logging
+- Improved parameter flexibility (@RequestParam instead of @RequestBody)
+
+### Fixed
+- "Bu sipariş size atanmamış" error in pickup endpoint
+- Order.courier NULL issue in acceptAssignment
+- 415 Unsupported Media Type error
+- Proper courier ownership verification
+
+---
+
+## [1.5.0] - 2025-12-06
+
+### Added
+- **Order Assignment System**
+  - FIFO queue-based automatic assignment algorithm
+  - GET `/api/v1/courier/assignments/pending` – Get pending assignments
+  - POST `/api/v1/courier/assignments/{id}/accept` – Accept assignment
+  - POST `/api/v1/courier/assignments/{id}/reject` – Reject assignment with reason
+  - 4-minute timeout mechanism with automatic reassignment
+  - Assignment history tracking
+  - `CourierAssignmentController` with 3 endpoints
+  
+- **Database Schema**
+  - `order_assignments` table for assignment tracking
+  - Assignment status enum (PENDING, ACCEPTED, REJECTED, TIMEOUT)
+  - Assignment type enum (AUTO, REASSIGNMENT, MANUAL)
+  - Timestamp tracking (assigned_at, response_at, timeout_at)
+  
+- **Assignment Service**
+  - `OrderAssignmentService` with auto-assignment logic
+  - Timeout checking scheduled task
+  - Automatic reassignment on timeout/reject
+  - Queue management integration
+
+### Changed
+- Business order creation now triggers automatic assignment
+- Enhanced order lifecycle with assignment tracking
+
+### Fixed
+- Duplicate assignment creation prevention
+- Timeout filter in pending assignments query
+- Assignment status transition validation
+
+---
+
+## [1.4.0] - 2025-12-06
+
+### Added
+- **On-Duty Courier Management System**
+  - POST `/api/v1/courier/shifts/{id}/check-in` – Check-in to shift (become on-duty)
+  - POST `/api/v1/courier/shifts/check-out` – Check-out from shift (go off-duty)
+  - FIFO queue management for on-duty couriers
+  - Real-time on-duty status tracking
+  - `OnDutyService` with queue operations
+  
+- **Database Schema**
+  - `on_duty_couriers` table with FIFO queue support
+  - Created timestamp and on_duty_since tracking
+  - Source tracking (shift vs manual)
+  - Automatic cleanup on check-out
+
+### Changed
+- Enhanced shift system with on-duty integration
+- ShiftService updated with check-in/check-out logic
+
+### Security
+- Enhanced authorization checks in all endpoints
+- Proper ownership verification
+- Status-based access control
+
+---
+
 ## [1.3.0] - 2025-11-14
 
 ### Added
