@@ -12,12 +12,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.web.servlet.assertj.MockMvcTester;
-import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -25,7 +22,6 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@AutoConfigureMockMvc
 public class BusinessOrderControllerIT extends AbstractIntegrationTest {
 
     @Autowired
@@ -35,13 +31,7 @@ public class BusinessOrderControllerIT extends AbstractIntegrationTest {
     OrderRepository orderRepository;
 
     @Autowired
-    JsonMapper objectMapper;
-
-    @Autowired
     JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    MockMvcTester mockMvc;
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
@@ -103,14 +93,14 @@ public class BusinessOrderControllerIT extends AbstractIntegrationTest {
                 .post()
                 .uri("/api/v1/business/orders")
                 .header("Authorization", "Bearer " + token)
-                .content(objectMapper.writeValueAsString(request))
+                .content(dtoToJson(request))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange();
 
         // THEN
-        var json = objectMapper.readTree(response.getResponse().getContentAsString());
-        var actualDto = objectMapper.treeToValue(json.path("data"), OrderResponse.class);
+        var json = stringToJson(response.getResponse().getContentAsString());
+        var actualDto = jsonToDto(json.path("data"), OrderResponse.class);
         assertThat(actualDto).usingRecursiveComparison()
                 .ignoringFields("createdAt", "orderDate", "updatedAt", "orderNumber")
                 .isEqualTo(expectedResponse);

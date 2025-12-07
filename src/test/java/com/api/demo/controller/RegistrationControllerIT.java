@@ -8,27 +8,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.assertj.MockMvcTester;
-import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@AutoConfigureMockMvc
 public class RegistrationControllerIT extends AbstractIntegrationTest {
 
     @Autowired
     BusinessRepository businessRepository;
-
-    @Autowired
-    JsonMapper objectMapper;
-
-    @Autowired
-    MockMvcTester mockMvc;
 
     @BeforeEach
     void setUp() {
@@ -79,7 +69,7 @@ public class RegistrationControllerIT extends AbstractIntegrationTest {
         var response = mockMvc
                 .post()
                 .uri("/api/v1/auth/register/business")
-                .content(objectMapper.writeValueAsString(request))
+                .content(dtoToJson(request))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange();
