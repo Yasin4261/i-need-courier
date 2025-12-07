@@ -7,6 +7,7 @@ import com.api.demo.exception.UnauthorizedAccessException;
 import com.api.demo.model.Order;
 import com.api.demo.model.enums.OrderStatus;
 import com.api.demo.repository.OrderRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,14 +18,10 @@ import java.time.LocalDateTime;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/courier/orders")
+@RequiredArgsConstructor
 public class CourierOrderController {
 
-
     private final OrderRepository orderRepository;
-
-    public CourierOrderController(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-    }
 
     /**
      * Get order details
