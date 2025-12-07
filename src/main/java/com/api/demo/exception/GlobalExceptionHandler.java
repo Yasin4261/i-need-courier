@@ -169,7 +169,7 @@ public class GlobalExceptionHandler {
             NoCourierAvailableException ex,
             HttpServletRequest request) {
 
-        logger.warn("No courier available: {}", ex.getMessage());
+        log.warn("No courier available: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 503,
@@ -191,7 +191,7 @@ public class GlobalExceptionHandler {
             AssignmentNotFoundException ex,
             HttpServletRequest request) {
 
-        logger.warn("Assignment not found: {}", ex.getMessage());
+        log.warn("Assignment not found: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 404,
@@ -213,7 +213,7 @@ public class GlobalExceptionHandler {
             AssignmentNotOwnedException ex,
             HttpServletRequest request) {
 
-        logger.warn("Assignment not owned: {}", ex.getMessage());
+        log.warn("Assignment not owned: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 403,
@@ -235,7 +235,7 @@ public class GlobalExceptionHandler {
             AssignmentExpiredException ex,
             HttpServletRequest request) {
 
-        logger.warn("Assignment expired: {}", ex.getMessage());
+        log.warn("Assignment expired: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 410,
@@ -257,7 +257,7 @@ public class GlobalExceptionHandler {
             InvalidAssignmentStatusException ex,
             HttpServletRequest request) {
 
-        logger.warn("Invalid assignment status: {}", ex.getMessage());
+        log.warn("Invalid assignment status: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 409,

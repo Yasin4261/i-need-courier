@@ -53,9 +53,9 @@ public class BusinessOrderController {
         // Auto-assign to next available courier (FIFO)
         try {
             orderAssignmentService.assignToNextAvailableCourier(response.getOrderId());
-            logger.info("Order {} auto-assigned to courier via FIFO", response.getOrderId());
+            log.info("Order {} auto-assigned to courier via FIFO", response.getOrderId());
         } catch (Exception e) {
-            logger.warn("Failed to auto-assign order {}: {}", response.getOrderId(), e.getMessage());
+            log.warn("Failed to auto-assign order {}: {}", response.getOrderId(), e.getMessage());
             // Order is still created, just not assigned yet
         }
 
