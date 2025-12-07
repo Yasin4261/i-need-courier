@@ -4,7 +4,6 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.ArchTest;
-import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 import lombok.Generated;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,7 @@ class ConventionsTest {
     @Test
     @ArchTest
     void noClassShouldDefineStaticLogger() {
-        ArchRule rule = ArchRuleDefinition.fields()
+        var rule = ArchRuleDefinition.fields()
                 .that().haveRawType(Logger.class)
                 .or().haveRawType(java.util.logging.Logger.class)
                 .should().beAnnotatedWith(Generated.class)
@@ -36,7 +35,7 @@ class ConventionsTest {
     @Test
     @ArchTest
     void noAutowiredUseInSourceCodeInFavorOfConstructorInjection() {
-        ArchRule rule = ArchRuleDefinition.noFields()
+        var rule = ArchRuleDefinition.noFields()
                 .should().beAnnotatedWith(Autowired.class)
                 .because("Prefer constructor injection over field injection via Autowired");
         rule.check(SOURCES);
