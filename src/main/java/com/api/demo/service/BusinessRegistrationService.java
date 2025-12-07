@@ -1,11 +1,8 @@
 package com.api.demo.service;
 
-import com.api.demo.dto.BusinessLoginRequest;
-import com.api.demo.dto.BusinessLoginResponse;
 import com.api.demo.dto.BusinessRegistrationRequest;
 import com.api.demo.dto.BusinessRegistrationResponse;
 import com.api.demo.exception.CourierAlreadyExistsException;
-import com.api.demo.exception.InvalidCredentialsException;
 import com.api.demo.model.Business;
 import com.api.demo.repository.BusinessRepository;
 import com.api.demo.security.JwtTokenProvider;
@@ -20,15 +17,15 @@ import java.util.UUID;
 @Service
 @Transactional
 @Slf4j
-public class BusinessAuthService {
+public class BusinessRegistrationService {
 
     private final BusinessRepository businessRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public BusinessAuthService(BusinessRepository businessRepository,
-                              PasswordEncoder passwordEncoder,
-                              JwtTokenProvider jwtTokenProvider) {
+    public BusinessRegistrationService(BusinessRepository businessRepository,
+                                       PasswordEncoder passwordEncoder,
+                                       JwtTokenProvider jwtTokenProvider) {
         this.businessRepository = businessRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -71,33 +68,5 @@ public class BusinessAuthService {
         );
     }
 
-    public BusinessLoginResponse login(BusinessLoginRequest request) {
-        log.info("Login attempt for business email: {}", request.getEmail());
-
-        Business business = businessRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
-
-        if (!passwordEncoder.matches(request.getPassword(), business.getPasswordHash())) {
-            throw new InvalidCredentialsException("Invalid email or password");
-        }
-
-        if (!business.canLogin()) {
-            throw new InvalidCredentialsException("Business account is " + business.getStatus());
-        }
-
-        business.recordLogin();
-        businessRepository.save(business);
-
-        String token = jwtTokenProvider.generateToken(business.getId(), business.getEmail());
-
-        return new BusinessLoginResponse(
-            token,
-            business.getId(),
-            business.getName(),
-            business.getEmail(),
-            business.getStatus().toString(),
-            "Login successful"
-        );
-    }
 }
 
