@@ -7,19 +7,18 @@ import com.api.demo.exception.UnauthorizedAccessException;
 import com.api.demo.model.Order;
 import com.api.demo.model.enums.OrderStatus;
 import com.api.demo.repository.OrderRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/courier/orders")
 public class CourierOrderController {
 
-    private static final Logger logger = LoggerFactory.getLogger(CourierOrderController.class);
 
     private final OrderRepository orderRepository;
 
@@ -57,22 +56,22 @@ public class CourierOrderController {
             @RequestParam(required = false) String notes) {
 
         Long courierId = extractCourierId(authentication);
-        logger.info("Pickup request - Courier: {}, Order: {}, Notes: {}", courierId, orderId, notes);
+        log.info("Pickup request - Courier: {}, Order: {}, Notes: {}", courierId, orderId, notes);
 
         // Order'ı bul
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> {
-                    logger.error("Pickup failed - Order {} not found", orderId);
+                    log.error("Pickup failed - Order {} not found", orderId);
                     return new OrderNotFoundException(orderId);
                 });
 
-        logger.debug("Order found - ID: {}, Status: {}, CourierId: {}",
+        log.debug("Order found - ID: {}, Status: {}, CourierId: {}",
                     order.getId(), order.getStatus(),
                     order.getCourier() != null ? order.getCourier().getId() : "NULL");
 
         // Courier kontrolü (detaylı logging)
         if (order.getCourier() == null) {
-            logger.error("Pickup failed - Order {} has no courier assigned! Order status: {}",
+            log.error("Pickup failed - Order {} has no courier assigned! Order status: {}",
                         orderId, order.getStatus());
             throw new UnauthorizedAccessException(
                 "Bu sipariş henüz bir kuryeye atanmamış. Lütfen önce siparişi kabul edin."
@@ -80,7 +79,7 @@ public class CourierOrderController {
         }
 
         if (!order.getCourier().getId().equals(courierId)) {
-            logger.error("Pickup failed - Order {} belongs to courier {} but requested by courier {}",
+            log.error("Pickup failed - Order {} belongs to courier {} but requested by courier {}",
                         orderId, order.getCourier().getId(), courierId);
             throw new UnauthorizedAccessException(
                 String.format("Bu sipariş size ait değil. Sipariş kurye %d'ye atanmış.",
@@ -90,7 +89,7 @@ public class CourierOrderController {
 
         // Status kontrolü
         if (order.getStatus() != OrderStatus.ASSIGNED) {
-            logger.error("Pickup failed - Order {} has invalid status: {}. Expected: ASSIGNED",
+            log.error("Pickup failed - Order {} has invalid status: {}. Expected: ASSIGNED",
                         orderId, order.getStatus());
             throw new InvalidOrderOperationException(
                 String.format("Bu sipariş pickup yapılamaz. Mevcut durum: %s, Beklenen: ASSIGNED",
@@ -106,7 +105,7 @@ public class CourierOrderController {
         }
 
         orderRepository.save(order);
-        logger.info("Pickup successful - Order {} picked up by courier {}", orderId, courierId);
+        log.info("Pickup successful - Order {} picked up by courier {}", orderId, courierId);
 
         return ResponseEntity.ok(ApiResponse.success(order, "Sipariş alındı (PICKED_UP)"));
     }
@@ -120,26 +119,26 @@ public class CourierOrderController {
             @PathVariable Long orderId) {
 
         Long courierId = extractCourierId(authentication);
-        logger.info("Start delivery request - Courier: {}, Order: {}", courierId, orderId);
+        log.info("Start delivery request - Courier: {}, Order: {}", courierId, orderId);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> {
-                    logger.error("Start delivery failed - Order {} not found", orderId);
+                    log.error("Start delivery failed - Order {} not found", orderId);
                     return new OrderNotFoundException(orderId);
                 });
 
-        logger.debug("Order found - ID: {}, Status: {}, CourierId: {}",
+        log.debug("Order found - ID: {}, Status: {}, CourierId: {}",
                     order.getId(), order.getStatus(),
                     order.getCourier() != null ? order.getCourier().getId() : "NULL");
 
         if (order.getCourier() == null || !order.getCourier().getId().equals(courierId)) {
-            logger.error("Start delivery failed - Order {} courier mismatch. Expected: {}, Got: {}",
+            log.error("Start delivery failed - Order {} courier mismatch. Expected: {}, Got: {}",
                         orderId, order.getCourier() != null ? order.getCourier().getId() : "NULL", courierId);
             throw new UnauthorizedAccessException("Bu sipariş size ait değil");
         }
 
         if (order.getStatus() != OrderStatus.PICKED_UP) {
-            logger.error("Start delivery failed - Order {} invalid status: {}. Expected: PICKED_UP",
+            log.error("Start delivery failed - Order {} invalid status: {}. Expected: PICKED_UP",
                         orderId, order.getStatus());
             throw new InvalidOrderOperationException(
                 String.format("Teslimat başlatılamaz. Mevcut durum: %s, Beklenen: PICKED_UP",
@@ -151,7 +150,7 @@ public class CourierOrderController {
         order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);
 
-        logger.info("Start delivery successful - Order {} now IN_TRANSIT by courier {}", orderId, courierId);
+        log.info("Start delivery successful - Order {} now IN_TRANSIT by courier {}", orderId, courierId);
 
         return ResponseEntity.ok(ApiResponse.success(order, "Teslimat başladı (IN_TRANSIT)"));
     }
@@ -167,27 +166,27 @@ public class CourierOrderController {
             @RequestParam(required = false) Double collectionAmount) {
 
         Long courierId = extractCourierId(authentication);
-        logger.info("Complete delivery request - Courier: {}, Order: {}, Notes: {}, Amount: {}",
+        log.info("Complete delivery request - Courier: {}, Order: {}, Notes: {}, Amount: {}",
                    courierId, orderId, notes, collectionAmount);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> {
-                    logger.error("Complete delivery failed - Order {} not found", orderId);
+                    log.error("Complete delivery failed - Order {} not found", orderId);
                     return new OrderNotFoundException(orderId);
                 });
 
-        logger.debug("Order found - ID: {}, Status: {}, CourierId: {}",
+        log.debug("Order found - ID: {}, Status: {}, CourierId: {}",
                     order.getId(), order.getStatus(),
                     order.getCourier() != null ? order.getCourier().getId() : "NULL");
 
         if (order.getCourier() == null || !order.getCourier().getId().equals(courierId)) {
-            logger.error("Complete delivery failed - Order {} courier mismatch. Expected: {}, Got: {}",
+            log.error("Complete delivery failed - Order {} courier mismatch. Expected: {}, Got: {}",
                         orderId, order.getCourier() != null ? order.getCourier().getId() : "NULL", courierId);
             throw new UnauthorizedAccessException("Bu sipariş size ait değil");
         }
 
         if (order.getStatus() != OrderStatus.IN_TRANSIT) {
-            logger.error("Complete delivery failed - Order {} invalid status: {}. Expected: IN_TRANSIT",
+            log.error("Complete delivery failed - Order {} invalid status: {}. Expected: IN_TRANSIT",
                         orderId, order.getStatus());
             throw new InvalidOrderOperationException(
                 String.format("Teslimat tamamlanamaz. Mevcut durum: %s, Beklenen: IN_TRANSIT",
@@ -200,16 +199,16 @@ public class CourierOrderController {
 
         if (notes != null && !notes.isBlank()) {
             order.setCourierNotes(notes);
-            logger.debug("Added courier notes to order {}", orderId);
+            log.debug("Added courier notes to order {}", orderId);
         }
 
         if (collectionAmount != null) {
             order.setCollectionAmount(java.math.BigDecimal.valueOf(collectionAmount));
-            logger.debug("Set collection amount {} for order {}", collectionAmount, orderId);
+            log.debug("Set collection amount {} for order {}", collectionAmount, orderId);
         }
 
         orderRepository.save(order);
-        logger.info("Complete delivery successful - Order {} delivered by courier {}", orderId, courierId);
+        log.info("Complete delivery successful - Order {} delivered by courier {}", orderId, courierId);
 
         return ResponseEntity.ok(ApiResponse.success(order, "Sipariş teslim edildi (DELIVERED)"));
     }

@@ -1,18 +1,17 @@
 package com.api.demo.service;
 
 import com.api.demo.model.OrderAssignment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class WebSocketNotificationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketNotificationService.class);
 
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -40,10 +39,10 @@ public class WebSocketNotificationService {
                 "/queue/assignments",
                 notification
             );
-            logger.info("Sent new assignment notification to courier {}: assignment {}",
+            log.info("Sent new assignment notification to courier {}: assignment {}",
                        assignment.getCourierId(), assignment.getId());
         } catch (Exception e) {
-            logger.error("Failed to send WebSocket notification to courier {}: {}",
+            log.error("Failed to send WebSocket notification to courier {}: {}",
                         assignment.getCourierId(), e.getMessage());
         }
     }
@@ -67,10 +66,10 @@ public class WebSocketNotificationService {
                 "/queue/orders",
                 notification
             );
-            logger.info("Sent order status notification to business {}: order {} - {}",
+            log.info("Sent order status notification to business {}: order {} - {}",
                        businessId, orderId, status);
         } catch (Exception e) {
-            logger.error("Failed to send WebSocket notification to business {}: {}",
+            log.error("Failed to send WebSocket notification to business {}: {}",
                         businessId, e.getMessage());
         }
     }
@@ -92,10 +91,10 @@ public class WebSocketNotificationService {
                 "/queue/assignments",
                 notification
             );
-            logger.info("Sent timeout notification to courier {}: assignment {}",
+            log.info("Sent timeout notification to courier {}: assignment {}",
                        courierId, assignmentId);
         } catch (Exception e) {
-            logger.error("Failed to send timeout notification: {}", e.getMessage());
+            log.error("Failed to send timeout notification: {}", e.getMessage());
         }
     }
 }

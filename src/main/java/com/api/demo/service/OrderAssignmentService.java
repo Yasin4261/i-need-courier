@@ -11,8 +11,7 @@ import com.api.demo.model.enums.OrderStatus;
 import com.api.demo.repository.CourierRepository;
 import com.api.demo.repository.OrderAssignmentRepository;
 import com.api.demo.repository.OrderRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,10 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class OrderAssignmentService {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderAssignmentService.class);
 
     @Value("${order.assignment.timeout.minutes:2}")
     private int assignmentTimeoutMinutes;
@@ -61,11 +60,11 @@ public class OrderAssignmentService {
 
     @Transactional
     public OrderAssignment assignToNextAvailableCourier(Long orderId, AssignmentType assignmentType) {
-        logger.info("Attempting to assign order {} with type {}", orderId, assignmentType);
+        log.info("Attempting to assign order {} with type {}", orderId, assignmentType);
 
         // DUPLICATE KONTROLÜ: Eğer order'ın zaten aktif PENDING assignment'ı varsa, yeni oluşturma!
         if (orderAssignmentRepository.existsByOrderIdAndStatus(orderId, AssignmentStatus.PENDING)) {
-            logger.warn("Order {} already has a PENDING assignment, skipping duplicate creation", orderId);
+            log.warn("Order {} already has a PENDING assignment, skipping duplicate creation", orderId);
             return orderAssignmentRepository.findByOrderIdAndStatus(orderId, AssignmentStatus.PENDING)
                     .orElseThrow(() -> new BusinessException("Beklenmeyen durum: Pending assignment bulunamadı"));
         }
@@ -82,7 +81,7 @@ public class OrderAssignmentService {
             if (lastTimedOutCourierId != null) {
                 long totalOnDutyCouriers = onDutyService.countOnDutyCouriers();
                 if (totalOnDutyCouriers <= 1) {
-                    logger.warn("Cannot reassign order {}: only 1 courier on-duty (courier {}). " +
+                    log.warn("Cannot reassign order {}: only 1 courier on-duty (courier {}). " +
                               "Order will remain unassigned until more couriers are available or current courier accepts.",
                               orderId, lastTimedOutCourierId);
                     throw new BusinessException("Şu anda yeterli kurye yok. Sipariş beklemede kalacak.");
@@ -95,11 +94,11 @@ public class OrderAssignmentService {
         try {
             nextCourier = onDutyService.getNextInQueue();
         } catch (RuntimeException e) {
-            logger.error("No courier available for order {}: {}", orderId, e.getMessage());
+            log.error("No courier available for order {}: {}", orderId, e.getMessage());
             throw new NoCourierAvailableException("Şu anda aktif kurye yok. Lütfen daha sonra tekrar deneyin.");
         }
 
-        logger.info("Next courier in queue: {} (on_duty_since: {})",
+        log.info("Next courier in queue: {} (on_duty_since: {})",
                    nextCourier.getCourierId(), nextCourier.getOnDutySince());
 
         // 2. Order'ı güncelle
@@ -124,7 +123,7 @@ public class OrderAssignmentService {
         assignment.setTimeoutAt(OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(assignmentTimeoutMinutes));
 
         OrderAssignment savedAssignment = orderAssignmentRepository.save(assignment);
-        logger.info("Created assignment {}: order {} → courier {} (timeout: {})",
+        log.info("Created assignment {}: order {} → courier {} (timeout: {})",
                    savedAssignment.getId(), orderId, nextCourier.getCourierId(), savedAssignment.getTimeoutAt());
 
         // 4. WebSocket bildirimi gönder (hata olursa assignment yine de oluşturulsun)
@@ -138,7 +137,7 @@ public class OrderAssignmentService {
 
             notificationService.notifyNewAssignment(savedAssignment, orderDetails);
         } catch (Exception e) {
-            logger.warn("Failed to send WebSocket notification for assignment {}: {}",
+            log.warn("Failed to send WebSocket notification for assignment {}: {}",
                        savedAssignment.getId(), e.getMessage());
             // Assignment başarıyla oluşturuldu, sadece notification başarısız - devam et
         }
@@ -151,7 +150,7 @@ public class OrderAssignmentService {
      */
     @Transactional
     public void acceptAssignment(Long assignmentId, Long courierId) {
-        logger.info("Courier {} accepting assignment {}", courierId, assignmentId);
+        log.info("Courier {} accepting assignment {}", courierId, assignmentId);
 
         OrderAssignment assignment = orderAssignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new AssignmentNotFoundException(assignmentId));
@@ -186,7 +185,7 @@ public class OrderAssignmentService {
         Order order = orderRepository.findById(assignment.getOrderId())
                 .orElseThrow(() -> new BusinessException("Sipariş bulunamadı"));
 
-        logger.debug("Before update - Order {}: status={}, courierId={}",
+        log.debug("Before update - Order {}: status={}, courierId={}",
                     order.getId(), order.getStatus(),
                     order.getCourier() != null ? order.getCourier().getId() : "NULL");
 
@@ -198,7 +197,7 @@ public class OrderAssignmentService {
         order.setCourier(courier); // ← ÖNEMLİ: Courier'i order'a bağla!
         Order savedOrder = orderRepository.save(order);
 
-        logger.info("After update - Order {}: status={}, courierId={}, courier set successfully",
+        log.info("After update - Order {}: status={}, courierId={}, courier set successfully",
                    savedOrder.getId(), savedOrder.getStatus(),
                    savedOrder.getCourier() != null ? savedOrder.getCourier().getId() : "NULL");
 
@@ -206,11 +205,11 @@ public class OrderAssignmentService {
         try {
             onDutyService.moveToEndOfQueue(courierId);
         } catch (Exception e) {
-            logger.warn("Failed to move courier {} to end of queue: {}", courierId, e.getMessage());
+            log.warn("Failed to move courier {} to end of queue: {}", courierId, e.getMessage());
             // Accept işlemi başarılı, queue pozisyonu güncellenemedi - önemli değil
         }
 
-        logger.info("Assignment {} accepted by courier {}", assignmentId, courierId);
+        log.info("Assignment {} accepted by courier {}", assignmentId, courierId);
 
         // Business'e bildir (hata olursa logla ama accept'i başarısız sayma)
         try {
@@ -223,7 +222,7 @@ public class OrderAssignmentService {
                 );
             }
         } catch (Exception e) {
-            logger.warn("Failed to notify business for order {}: {}", order.getId(), e.getMessage());
+            log.warn("Failed to notify business for order {}: {}", order.getId(), e.getMessage());
             // Accept başarılı, sadece notification başarısız
         }
     }
@@ -233,7 +232,7 @@ public class OrderAssignmentService {
      */
     @Transactional
     public void rejectAssignment(Long assignmentId, Long courierId, String reason) {
-        logger.info("Courier {} rejecting assignment {}: {}", courierId, assignmentId, reason);
+        log.info("Courier {} rejecting assignment {}: {}", courierId, assignmentId, reason);
 
         OrderAssignment assignment = orderAssignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new AssignmentNotFoundException(assignmentId));
@@ -256,13 +255,13 @@ public class OrderAssignmentService {
         assignment.setRejectionReason(reason);
         orderAssignmentRepository.save(assignment);
 
-        logger.info("Assignment {} rejected, reassigning to next courier", assignmentId);
+        log.info("Assignment {} rejected, reassigning to next courier", assignmentId);
 
         // Bir sonraki kuryeye ata
         try {
             assignToNextAvailableCourier(assignment.getOrderId(), AssignmentType.REASSIGNMENT);
         } catch (BusinessException e) {
-            logger.warn("Failed to reassign order {} after rejection: {}", assignment.getOrderId(), e.getMessage());
+            log.warn("Failed to reassign order {} after rejection: {}", assignment.getOrderId(), e.getMessage());
             // Reject başarılı, ama yeniden atama yapılamadı (örn: kurye yok)
             // Order PENDING kalacak, sonra manuel atanabilir veya yeni kurye geldiğinde atanır
             throw new BusinessException("Sipariş reddedildi ancak başka kurye yok. Order beklemede kalacak.");
@@ -288,12 +287,12 @@ public class OrderAssignmentService {
                 .findByStatusAndTimeoutAtBefore(AssignmentStatus.PENDING, now);
 
         if (!timedOutAssignments.isEmpty()) {
-            logger.info("Found {} timed out assignments", timedOutAssignments.size());
+            log.info("Found {} timed out assignments", timedOutAssignments.size());
         }
 
         for (OrderAssignment assignment : timedOutAssignments) {
             try {
-                logger.warn("Assignment {} timed out (courier: {}, order: {})",
+                log.warn("Assignment {} timed out (courier: {}, order: {})",
                            assignment.getId(), assignment.getCourierId(), assignment.getOrderId());
 
                 // Assignment'ı timeout yap
@@ -313,12 +312,12 @@ public class OrderAssignmentService {
                     assignToNextAvailableCourier(assignment.getOrderId(), AssignmentType.REASSIGNMENT);
                 } catch (BusinessException be) {
                     // Yeterli kurye yok - Order beklemede kalacak
-                    logger.warn("Cannot reassign order {}: {}", assignment.getOrderId(), be.getMessage());
+                    log.warn("Cannot reassign order {}: {}", assignment.getOrderId(), be.getMessage());
                     // Order status'ünü PENDING tut, kurye boşaldığında veya yeni kurye geldiğinde atanacak
                 }
 
             } catch (Exception e) {
-                logger.error("Error handling timeout for assignment {}: {}",
+                log.error("Error handling timeout for assignment {}: {}",
                            assignment.getId(), e.getMessage());
             }
         }
