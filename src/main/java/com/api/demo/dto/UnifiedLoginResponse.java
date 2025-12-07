@@ -21,6 +21,7 @@ public class UnifiedLoginResponse {
     private String email;
     private String name;
     private UserType userType;
+    // TODO : Make the status enum
     private String status;
     private String message;
 
