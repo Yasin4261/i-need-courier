@@ -3,14 +3,22 @@ package com.api.demo.model;
 import com.api.demo.model.enums.AssignmentStatus;
 import com.api.demo.model.enums.AssignmentType;
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "order_assignments")
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class OrderAssignment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "order_id", nullable = false)
@@ -45,119 +53,40 @@ public class OrderAssignment {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    // Constructors
-    public OrderAssignment() {
-        this.assignedAt = OffsetDateTime.now();
-        this.status = AssignmentStatus.PENDING;
-        this.assignmentType = AssignmentType.AUTO;
-        this.createdAt = OffsetDateTime.now();
-        this.updatedAt = OffsetDateTime.now();
+    /**
+     * Constructor with default values for new assignments
+     */
+    public static OrderAssignment createNew() {
+        OrderAssignment assignment = new OrderAssignment();
+        assignment.assignedAt = OffsetDateTime.now();
+        assignment.status = AssignmentStatus.PENDING;
+        assignment.assignmentType = AssignmentType.AUTO;
+        assignment.createdAt = OffsetDateTime.now();
+        assignment.updatedAt = OffsetDateTime.now();
+        return assignment;
     }
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
-    }
-
-    public Long getCourierId() {
-        return courierId;
-    }
-
-    public void setCourierId(Long courierId) {
-        this.courierId = courierId;
-    }
-
-    public OffsetDateTime getAssignedAt() {
-        return assignedAt;
-    }
-
-    public void setAssignedAt(OffsetDateTime assignedAt) {
-        this.assignedAt = assignedAt;
-    }
-
-    public OffsetDateTime getResponseAt() {
-        return responseAt;
-    }
-
-    public void setResponseAt(OffsetDateTime responseAt) {
-        this.responseAt = responseAt;
-    }
-
-    public AssignmentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(AssignmentStatus status) {
-        this.status = status;
-    }
-
-    public String getRejectionReason() {
-        return rejectionReason;
-    }
-
-    public void setRejectionReason(String rejectionReason) {
-        this.rejectionReason = rejectionReason;
-    }
-
-    public AssignmentType getAssignmentType() {
-        return assignmentType;
-    }
-
-    public void setAssignmentType(AssignmentType assignmentType) {
-        this.assignmentType = assignmentType;
-    }
-
-    public OffsetDateTime getTimeoutAt() {
-        return timeoutAt;
-    }
-
-    public void setTimeoutAt(OffsetDateTime timeoutAt) {
-        this.timeoutAt = timeoutAt;
-    }
-
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = OffsetDateTime.now();
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = OffsetDateTime.now();
+        }
+        if (this.assignedAt == null) {
+            this.assignedAt = OffsetDateTime.now();
+        }
+        if (this.status == null) {
+            this.status = AssignmentStatus.PENDING;
+        }
+        if (this.assignmentType == null) {
+            this.assignmentType = AssignmentType.AUTO;
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = OffsetDateTime.now();
     }
-
-    @Override
-    public String toString() {
-        return "OrderAssignment{" +
-                "id=" + id +
-                ", orderId=" + orderId +
-                ", courierId=" + courierId +
-                ", status=" + status +
-                ", assignmentType=" + assignmentType +
-                ", assignedAt=" + assignedAt +
-                '}';
-    }
 }
-

@@ -1,6 +1,7 @@
 package com.api.demo.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -9,10 +10,16 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "couriers")
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class Courier {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false, length = 100)
@@ -25,6 +32,7 @@ public class Courier {
     private String phone;
 
     @Column(name = "password_hash", nullable = false, length = 255)
+    @ToString.Exclude
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
@@ -43,10 +51,6 @@ public class Courier {
      */
     @Column(name = "on_duty_since")
     private LocalDateTime onDutySince;
-
-    // Constructors
-    public Courier() {
-    }
 
     public Courier(String name, String email, String phone, String passwordHash) {
         this.name = name;
@@ -69,79 +73,6 @@ public class Courier {
         public static final CourierStatus AVAILABLE = ONLINE;
     }
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public CourierStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(CourierStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getOnDutySince() {
-        return onDutySince;
-    }
-
-    public void setOnDutySince(LocalDateTime onDutySince) {
-        this.onDutySince = onDutySince;
-    }
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -152,18 +83,4 @@ public class Courier {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
-    @Override
-    public String toString() {
-        return "Courier{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", status=" + status +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 }
-

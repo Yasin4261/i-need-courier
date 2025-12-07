@@ -1,14 +1,24 @@
 package com.api.demo.model;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "on_duty_couriers")
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class OnDutyCourier {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "courier_id", nullable = false, unique = true)
@@ -28,79 +38,5 @@ public class OnDutyCourier {
 
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
-
-    // Constructors
-    public OnDutyCourier() {
-        this.createdAt = OffsetDateTime.now();
-        this.updatedAt = OffsetDateTime.now();
-    }
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getCourierId() {
-        return courierId;
-    }
-
-    public void setCourierId(Long courierId) {
-        this.courierId = courierId;
-    }
-
-    public Long getShiftId() {
-        return shiftId;
-    }
-
-    public void setShiftId(Long shiftId) {
-        this.shiftId = shiftId;
-    }
-
-    public OffsetDateTime getOnDutySince() {
-        return onDutySince;
-    }
-
-    public void setOnDutySince(OffsetDateTime onDutySince) {
-        this.onDutySince = onDutySince;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    @Override
-    public String toString() {
-        return "OnDutyCourier{" +
-                "id=" + id +
-                ", courierId=" + courierId +
-                ", shiftId=" + shiftId +
-                ", onDutySince=" + onDutySince +
-                ", source='" + source + '\'' +
-                '}';
-    }
 }
 
