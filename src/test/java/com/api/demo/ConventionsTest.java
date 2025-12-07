@@ -15,11 +15,11 @@ class ConventionsTest {
 
     private static final JavaClasses SOURCES = new ClassFileImporter()
             .withImportOption(new ImportOption.DoNotIncludeTests())
-            .importPackages("com.api.pako");
+            .importPackages("com.api.demo");
 
     private static final JavaClasses TESTS = new ClassFileImporter()
             .withImportOption(new ImportOption.OnlyIncludeTests())
-            .importPackages("com.api.pako");
+            .importPackages("com.api.demo");
 
     @Test
     @ArchTest
