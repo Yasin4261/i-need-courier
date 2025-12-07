@@ -1,8 +1,8 @@
 package com.api.demo.controller;
 
 import com.api.demo.dto.*;
-import com.api.demo.service.BusinessAuthService;
-import com.api.demo.service.CourierAuthService;
+import com.api.demo.service.BusinessRegistrationService;
+import com.api.demo.service.CourierRegistrationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class RegistrationController {
 
-    private final CourierAuthService courierAuthService;
-    private final BusinessAuthService businessAuthService;
+    private final CourierRegistrationService courierRegistrationService;
+    private final BusinessRegistrationService businessRegistrationService;
 
-    public RegistrationController(CourierAuthService courierAuthService,
-                                 BusinessAuthService businessAuthService) {
-        this.courierAuthService = courierAuthService;
-        this.businessAuthService = businessAuthService;
+    public RegistrationController(CourierRegistrationService courier,
+                                  BusinessRegistrationService business) {
+        this.courierRegistrationService = courier;
+        this.businessRegistrationService = business;
     }
 
     /**
@@ -44,7 +44,7 @@ public class RegistrationController {
 
         log.info("Courier registration request for: {}", request.getEmail());
 
-        CourierRegistrationResponse response = courierAuthService.register(request);
+        CourierRegistrationResponse response = courierRegistrationService.register(request);
         return ResponseEntity.ok(ApiResponse.success(response, "Courier registration successful"));
     }
 
@@ -63,7 +63,7 @@ public class RegistrationController {
 
         log.info("Business registration request for: {}", request.getName());
 
-        BusinessRegistrationResponse response = businessAuthService.register(request);
+        BusinessRegistrationResponse response = businessRegistrationService.register(request);
         return ResponseEntity.ok(ApiResponse.success(response, "Business registration successful. Pending approval."));
     }
 }

@@ -1,11 +1,8 @@
 package com.api.demo.service;
 
-import com.api.demo.dto.CourierLoginRequest;
-import com.api.demo.dto.CourierLoginResponse;
 import com.api.demo.dto.CourierRegistrationRequest;
 import com.api.demo.dto.CourierRegistrationResponse;
 import com.api.demo.exception.CourierAlreadyExistsException;
-import com.api.demo.exception.InvalidCredentialsException;
 import com.api.demo.model.Courier;
 import com.api.demo.repository.CourierRepository;
 import com.api.demo.security.JwtTokenProvider;
@@ -17,15 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @Slf4j
-public class CourierAuthService {
+public class CourierRegistrationService {
 
     private final CourierRepository courierRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public CourierAuthService(CourierRepository courierRepository,
-                             PasswordEncoder passwordEncoder,
-                             JwtTokenProvider jwtTokenProvider) {
+    public CourierRegistrationService(CourierRepository courierRepository,
+                                      PasswordEncoder passwordEncoder,
+                                      JwtTokenProvider jwtTokenProvider) {
         this.courierRepository = courierRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -63,31 +60,5 @@ public class CourierAuthService {
         );
     }
 
-    public CourierLoginResponse login(CourierLoginRequest request) {
-        log.info("Login attempt for courier email: {}", request.getEmail());
-
-        Courier courier = courierRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> {
-                log.warn("Login failed: Courier not found with email: {}", request.getEmail());
-                return new InvalidCredentialsException("Invalid email or password");
-            });
-
-        if (!passwordEncoder.matches(request.getPassword(), courier.getPasswordHash())) {
-            log.warn("Login failed: Invalid password for email: {}", request.getEmail());
-            throw new InvalidCredentialsException("Invalid email or password");
-        }
-
-        String token = jwtTokenProvider.generateToken(courier.getId(), courier.getEmail(), "COURIER");
-
-        log.info("Login successful for courier ID: {} ({})", courier.getId(), courier.getName());
-
-        return new CourierLoginResponse(
-            token,
-            courier.getId(),
-            courier.getName(),
-            courier.getEmail(),
-            "Login successful"
-        );
-    }
 }
 
