@@ -44,10 +44,10 @@ public class BusinessOrderController {
             @Valid @RequestBody OrderCreateRequest request,
             @RequestHeader("Authorization") String authHeader) {
 
-        Long businessId = extractBusinessIdFromToken(authHeader);
+        var businessId = extractBusinessIdFromToken(authHeader);
         log.info("Business {} creating new order", businessId);
 
-        OrderResponse response = orderService.createOrder(request, businessId);
+        var response = orderService.createOrder(request, businessId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -63,12 +63,11 @@ public class BusinessOrderController {
             @RequestParam(required = false) OrderStatus status,
             @RequestHeader("Authorization") String authHeader) {
 
-        Long businessId = extractBusinessIdFromToken(authHeader);
+        var businessId = extractBusinessIdFromToken(authHeader);
         log.info("Business {} fetching orders with status: {}", businessId, status);
 
-        List<OrderResponse> orders = orderService.getAllOrders(businessId, status);
-
-        String message = status != null
+        var orders = orderService.getAllOrders(businessId, status);
+        var message = status != null
                 ? "Orders with status " + status + " fetched successfully"
                 : "All orders fetched successfully";
 
