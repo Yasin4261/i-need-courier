@@ -119,3 +119,6 @@ application-local.properties
 application-dev.properties
 !application.properties
 !application-docker.properties
+
+# Copilot
+.idea/copilotDiffState.xml
