@@ -143,7 +143,7 @@ POST /api/v1/auth/login
 **Sorun:** `columnDefinition = "user_status"` enum tipi hatası  
 **Çözüm:** `@Column(nullable = false, length = 20)` olarak düzeltildi
 
-**Dosya:** `/src/main/java/com/api/demo/model/Courier.java`
+**Dosya:** `/src/main/java/com/api/pako/model/Courier.java`
 
 ### 2. Veritabanı Migration Eklendi
 **Sorun:** Veritabanında `status` kolonu `user_status` enum tipindeydi  

@@ -178,7 +178,7 @@ curl -X POST http://localhost:8080/api/v1/auth/login \
 ## 🏗️ Project Structure
 
 ```
-src/main/java/com/api/demo/
+src/main/java/com/api/pako/
 ├── controller/     # REST API endpoints
 ├── service/       # Business logic
 ├── repository/    # Database access

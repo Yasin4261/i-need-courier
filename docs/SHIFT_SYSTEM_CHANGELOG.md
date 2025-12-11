@@ -304,24 +304,24 @@ curl -X POST http://localhost:8080/api/v1/courier/shifts/reserve \
 
 ### Java Sınıfları
 ```
-com.api.demo.model/
+com.api.pako.model/
   ├── Shift.java                    - Vardiya entity
   ├── ShiftTemplate.java            - Şablon entity
   └── enums/
       ├── ShiftStatus.java          - Vardiya durumu enum
       └── ShiftRole.java            - Vardiya rolü enum
 
-com.api.demo.repository/
+com.api.pako.repository/
   ├── ShiftRepository.java          - Vardiya repository
   └── ShiftTemplateRepository.java  - Şablon repository
 
-com.api.demo.service/
+com.api.pako.service/
   └── ShiftService.java             - Vardiya iş mantığı
 
-com.api.demo.courier.controller/
+com.api.pako.courier.controller/
   └── CourierShiftController.java   - REST API
 
-com.api.demo.dto/
+com.api.pako.dto/
   ├── ShiftDTO.java
   ├── ShiftTemplateDTO.java
   ├── ReserveShiftRequest.java

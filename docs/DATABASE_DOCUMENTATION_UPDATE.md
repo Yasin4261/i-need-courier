@@ -208,7 +208,7 @@
 src/main/resources/db/migration/
 └── V12__Create_shift_system.sql          (Migration)
 
-src/main/java/com/api/demo/
+src/main/java/com/api/pako/
 ├── model/
 │   ├── Shift.java
 │   ├── ShiftTemplate.java

@@ -120,7 +120,7 @@ git push origin feature/123-description
 Our project follows Clean Layered Architecture:
 
 ```
-src/main/java/com/api/demo/
+src/main/java/com/api/pako/
 ├── controller/           # REST controllers (Presentation Layer)
 ├── service/             # Business logic (Application Layer)
 ├── repository/          # Data access (Persistence Layer)
