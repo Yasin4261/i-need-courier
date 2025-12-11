@@ -178,7 +178,7 @@ No - Uses existing database schema
 
 ---
 
-**Full Changelog:** [CHANGELOG.md](CHANGELOG.md)
+**Full Changelog:** [CHANGELOG.md](../CHANGELOG.md)
 ```
 
 6. **(Optional) Attach files:**
