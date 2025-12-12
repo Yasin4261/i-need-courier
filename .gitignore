@@ -51,6 +51,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 .idea/copilotDiffState.xml
+.idea/copilot.*
 
 # Eclipse
 .apt_generated
@@ -119,3 +120,5 @@ application-local.properties
 application-dev.properties
 !application.properties
 !application-docker.properties
+
+# Copilot

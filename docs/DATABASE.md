@@ -2,7 +2,9 @@
 
 ## Overview
 
-The I Need Courier system uses a MySQL database with the following core entities designed for B2B courier operations.
+The I Need Courier system uses a PostgreSQL (PostGIS-enabled) database with the following core entities designed for B2B courier operations.
+
+Note: this documentation uses PostgreSQL-native types and features (bigint/serial, timestamp, enums, PostGIS/geospatial types). Some older wording or examples may reference MySQL-style types (AUTO_INCREMENT, DATETIME). In the live project the schema and migrations target PostgreSQL; where the docs previously said AUTO_INCREMENT or DATETIME, interpret those as PostgreSQL sequences (bigserial) and timestamp types respectively.
 
 ## Entity Relationship Diagram
 

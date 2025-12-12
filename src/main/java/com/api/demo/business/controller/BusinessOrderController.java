@@ -34,6 +34,7 @@ public class BusinessOrderController {
 
     private final BusinessOrderService orderService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final com.api.demo.service.OrderAssignmentService orderAssignmentService;
 
     /**
      * Create a new order
@@ -48,6 +49,15 @@ public class BusinessOrderController {
         log.info("Business {} creating new order", businessId);
 
         var response = orderService.createOrder(request, businessId);
+
+        // Auto-assign to next available courier (FIFO)
+        try {
+            orderAssignmentService.assignToNextAvailableCourier(response.getOrderId());
+            log.info("Order {} auto-assigned to courier via FIFO", response.getOrderId());
+        } catch (Exception e) {
+            log.warn("Failed to auto-assign order {}: {}", response.getOrderId(), e.getMessage());
+            // Order is still created, just not assigned yet
+        }
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

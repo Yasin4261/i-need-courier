@@ -162,6 +162,116 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handle no courier available exception.
+     */
+    @ExceptionHandler(NoCourierAvailableException.class)
+    public ResponseEntity<ErrorResponse> handleNoCourierAvailableException(
+            NoCourierAvailableException ex,
+            HttpServletRequest request) {
+
+        log.warn("No courier available: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                503,
+                "Service Unavailable",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(errorResponse);
+    }
+
+    /**
+     * Handle assignment not found exception.
+     */
+    @ExceptionHandler(AssignmentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleAssignmentNotFoundException(
+            AssignmentNotFoundException ex,
+            HttpServletRequest request) {
+
+        log.warn("Assignment not found: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                404,
+                "Not Found",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(errorResponse);
+    }
+
+    /**
+     * Handle assignment not owned exception.
+     */
+    @ExceptionHandler(AssignmentNotOwnedException.class)
+    public ResponseEntity<ErrorResponse> handleAssignmentNotOwnedException(
+            AssignmentNotOwnedException ex,
+            HttpServletRequest request) {
+
+        log.warn("Assignment not owned: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                403,
+                "Forbidden",
+                "Bu atama size ait değil",
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(errorResponse);
+    }
+
+    /**
+     * Handle assignment expired exception.
+     */
+    @ExceptionHandler(AssignmentExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleAssignmentExpiredException(
+            AssignmentExpiredException ex,
+            HttpServletRequest request) {
+
+        log.warn("Assignment expired: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                410,
+                "Gone",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.GONE)
+                .body(errorResponse);
+    }
+
+    /**
+     * Handle invalid assignment status exception.
+     */
+    @ExceptionHandler(InvalidAssignmentStatusException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidAssignmentStatusException(
+            InvalidAssignmentStatusException ex,
+            HttpServletRequest request) {
+
+        log.warn("Invalid assignment status: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                409,
+                "Conflict",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(errorResponse);
+    }
+
+    /**
      * Handle business logic exceptions.
      */
     @ExceptionHandler(BusinessException.class)

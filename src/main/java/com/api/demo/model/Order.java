@@ -4,6 +4,7 @@ import com.api.demo.model.enums.OrderPriority;
 import com.api.demo.model.enums.OrderStatus;
 import com.api.demo.model.enums.PaymentType;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -16,10 +17,16 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "orders")
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "order_number", unique = true, nullable = false, length = 20)
@@ -38,10 +45,12 @@ public class Order {
     // Relations
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "business_id")
+    @ToString.Exclude
     private Business business;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "courier_id")
+    @ToString.Exclude
     private Courier courier;
 
     // Business contact info
@@ -135,235 +144,6 @@ public class Order {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // Constructors
-    public Order() {
-    }
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getOrderNumber() {
-        return orderNumber;
-    }
-
-    public void setOrderNumber(String orderNumber) {
-        this.orderNumber = orderNumber;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
-    public OrderPriority getPriority() {
-        return priority;
-    }
-
-    public void setPriority(OrderPriority priority) {
-        this.priority = priority;
-    }
-
-    public Business getBusiness() {
-        return business;
-    }
-
-    public void setBusiness(Business business) {
-        this.business = business;
-    }
-
-    public Courier getCourier() {
-        return courier;
-    }
-
-    public void setCourier(Courier courier) {
-        this.courier = courier;
-    }
-
-    public String getBusinessContactPerson() {
-        return businessContactPerson;
-    }
-
-    public void setBusinessContactPerson(String businessContactPerson) {
-        this.businessContactPerson = businessContactPerson;
-    }
-
-    public String getBusinessPhone() {
-        return businessPhone;
-    }
-
-    public void setBusinessPhone(String businessPhone) {
-        this.businessPhone = businessPhone;
-    }
-
-    public String getEndCustomerName() {
-        return endCustomerName;
-    }
-
-    public void setEndCustomerName(String endCustomerName) {
-        this.endCustomerName = endCustomerName;
-    }
-
-    public String getEndCustomerPhone() {
-        return endCustomerPhone;
-    }
-
-    public void setEndCustomerPhone(String endCustomerPhone) {
-        this.endCustomerPhone = endCustomerPhone;
-    }
-
-    public String getPickupAddress() {
-        return pickupAddress;
-    }
-
-    public void setPickupAddress(String pickupAddress) {
-        this.pickupAddress = pickupAddress;
-    }
-
-    public String getPickupAddressDescription() {
-        return pickupAddressDescription;
-    }
-
-    public void setPickupAddressDescription(String pickupAddressDescription) {
-        this.pickupAddressDescription = pickupAddressDescription;
-    }
-
-    public String getPickupContactPerson() {
-        return pickupContactPerson;
-    }
-
-    public void setPickupContactPerson(String pickupContactPerson) {
-        this.pickupContactPerson = pickupContactPerson;
-    }
-
-    public String getDeliveryAddress() {
-        return deliveryAddress;
-    }
-
-    public void setDeliveryAddress(String deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
-    }
-
-    public String getDeliveryAddressDescription() {
-        return deliveryAddressDescription;
-    }
-
-    public void setDeliveryAddressDescription(String deliveryAddressDescription) {
-        this.deliveryAddressDescription = deliveryAddressDescription;
-    }
-
-    public String getPackageDescription() {
-        return packageDescription;
-    }
-
-    public void setPackageDescription(String packageDescription) {
-        this.packageDescription = packageDescription;
-    }
-
-    public BigDecimal getPackageWeight() {
-        return packageWeight;
-    }
-
-    public void setPackageWeight(BigDecimal packageWeight) {
-        this.packageWeight = packageWeight;
-    }
-
-    public Integer getPackageCount() {
-        return packageCount;
-    }
-
-    public void setPackageCount(Integer packageCount) {
-        this.packageCount = packageCount;
-    }
-
-    public PaymentType getPaymentType() {
-        return paymentType;
-    }
-
-    public void setPaymentType(PaymentType paymentType) {
-        this.paymentType = paymentType;
-    }
-
-    public BigDecimal getDeliveryFee() {
-        return deliveryFee;
-    }
-
-    public void setDeliveryFee(BigDecimal deliveryFee) {
-        this.deliveryFee = deliveryFee;
-    }
-
-    public BigDecimal getCollectionAmount() {
-        return collectionAmount;
-    }
-
-    public void setCollectionAmount(BigDecimal collectionAmount) {
-        this.collectionAmount = collectionAmount;
-    }
-
-    public String getCourierNotes() {
-        return courierNotes;
-    }
-
-    public void setCourierNotes(String courierNotes) {
-        this.courierNotes = courierNotes;
-    }
-
-    public String getBusinessNotes() {
-        return businessNotes;
-    }
-
-    public void setBusinessNotes(String businessNotes) {
-        this.businessNotes = businessNotes;
-    }
-
-    public LocalDateTime getScheduledPickupTime() {
-        return scheduledPickupTime;
-    }
-
-    public void setScheduledPickupTime(LocalDateTime scheduledPickupTime) {
-        this.scheduledPickupTime = scheduledPickupTime;
-    }
-
-    public LocalDateTime getEstimatedDeliveryTime() {
-        return estimatedDeliveryTime;
-    }
-
-    public void setEstimatedDeliveryTime(LocalDateTime estimatedDeliveryTime) {
-        this.estimatedDeliveryTime = estimatedDeliveryTime;
-    }
-
-    public LocalDateTime getOrderDate() {
-        return orderDate;
-    }
-
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     // Helper methods
     public boolean isPending() {
         return this.status == OrderStatus.PENDING;
@@ -381,4 +161,3 @@ public class Order {
         return this.business != null && this.business.getId().equals(businessId);
     }
 }
-

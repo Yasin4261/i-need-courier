@@ -3,6 +3,7 @@ package com.api.demo.model;
 import com.api.demo.model.enums.ShiftRole;
 import com.api.demo.model.enums.ShiftStatus;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,11 +13,17 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "shifts")
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class Shift {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "shift_id")
+    @EqualsAndHashCode.Include
     private Long shiftId;
 
     @Column(name = "courier_id", nullable = false)
@@ -51,105 +58,12 @@ public class Shift {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Constructors
-    public Shift() {
-    }
-
     public Shift(Long courierId, LocalDateTime startTime, LocalDateTime endTime, ShiftRole shiftRole) {
         this.courierId = courierId;
         this.startTime = startTime;
         this.endTime = endTime;
         this.shiftRole = shiftRole;
         this.status = ShiftStatus.RESERVED;
-    }
-
-    // Getters and Setters
-    public Long getShiftId() {
-        return shiftId;
-    }
-
-    public void setShiftId(Long shiftId) {
-        this.shiftId = shiftId;
-    }
-
-    public Long getCourierId() {
-        return courierId;
-    }
-
-    public void setCourierId(Long courierId) {
-        this.courierId = courierId;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public ShiftRole getShiftRole() {
-        return shiftRole;
-    }
-
-    public void setShiftRole(ShiftRole shiftRole) {
-        this.shiftRole = shiftRole;
-    }
-
-    public ShiftStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ShiftStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCheckInTime() {
-        return checkInTime;
-    }
-
-    public void setCheckInTime(LocalDateTime checkInTime) {
-        this.checkInTime = checkInTime;
-    }
-
-    public LocalDateTime getCheckOutTime() {
-        return checkOutTime;
-    }
-
-    public void setCheckOutTime(LocalDateTime checkOutTime) {
-        this.checkOutTime = checkOutTime;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     @PrePersist
@@ -162,20 +76,4 @@ public class Shift {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
-    @Override
-    public String toString() {
-        return "Shift{" +
-                "shiftId=" + shiftId +
-                ", courierId=" + courierId +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", shiftRole=" + shiftRole +
-                ", status=" + status +
-                ", checkInTime=" + checkInTime +
-                ", checkOutTime=" + checkOutTime +
-                ", createdAt=" + createdAt +
-                '}';
-    }
 }
-
