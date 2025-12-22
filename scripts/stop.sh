@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 
 # Kill Java process
 echo "Killing Spring Boot application..."
-pkill -f "demo-0.0.1-SNAPSHOT.jar" 2>/dev/null || true
+pkill -f "pako-0.0.1-SNAPSHOT.jar" 2>/dev/null || true
 
 # Kill processes on ports
 echo "Freeing ports 8080 and 8082..."
@@ -90,14 +90,14 @@ echo ""
 echo -e "${YELLOW}🧹 Step 3: Cleaning up old processes...${NC}"
 lsof -ti:8080 | xargs kill -9 2>/dev/null || true
 lsof -ti:8082 | xargs kill -9 2>/dev/null || true
-pkill -f "demo-0.0.1-SNAPSHOT.jar" 2>/dev/null || true
+pkill -f "pako-0.0.1-SNAPSHOT.jar" 2>/dev/null || true
 sleep 2
 echo -e "${GREEN}✅ Cleanup complete${NC}"
 
 # Step 4: Start the application
 echo ""
 echo -e "${YELLOW}🚀 Step 4: Starting Spring Boot application...${NC}"
-nohup java -jar target/demo-0.0.1-SNAPSHOT.jar > logs/app.log 2>&1 &
+nohup java -jar target/pako-0.0.1-SNAPSHOT.jar > logs/app.log 2>&1 &
 APP_PID=$!
 
 echo "Application starting with PID: $APP_PID"

@@ -359,9 +359,9 @@ docker compose up -d
 ## References
 
 - Migration: `src/main/resources/db/migration/V14__Create_on_duty_couriers_table.sql`
-- Entity: `src/main/java/com/api/demo/model/OnDutyCourier.java`
-- Repository: `src/main/java/com/api/demo/repository/OnDutyCourierRepository.java`
-- Service: `src/main/java/com/api/demo/service/OnDutyService.java`
-- Integration: `src/main/java/com/api/demo/service/ShiftService.java`
+- Entity: `src/main/java/com/api/pako/model/OnDutyCourier.java`
+- Repository: `src/main/java/com/api/pako/repository/OnDutyCourierRepository.java`
+- Service: `src/main/java/com/api/pako/service/OnDutyService.java`
+- Integration: `src/main/java/com/api/pako/service/ShiftService.java`
 - Backfill: `scripts/backfill-on-duty-couriers.sh`
 

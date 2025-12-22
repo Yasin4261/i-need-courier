@@ -18,7 +18,7 @@
         <relativePath/> <!-- lookup from parent -->
     </parent>
     <groupId>com.api</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>pako</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>i-need-courier</name>
     <description>Demo project for Spring Boot</description>

@@ -29,7 +29,7 @@ src/main/resources/db/migration/
 
 ### Model & Enum
 ```
-src/main/java/com/api/demo/model/
+src/main/java/com/api/pako/model/
 ├── OrderAssignment.java
 └── enums/
     ├── AssignmentStatus.java
@@ -38,13 +38,13 @@ src/main/java/com/api/demo/model/
 
 ### Repository
 ```
-src/main/java/com/api/demo/repository/
+src/main/java/com/api/pako/repository/
 └── OrderAssignmentRepository.java
 ```
 
 ### Services
 ```
-src/main/java/com/api/demo/service/
+src/main/java/com/api/pako/service/
 ├── OrderAssignmentService.java (YENİ - timeout + assignment logic)
 ├── WebSocketNotificationService.java (YENİ - push notifications)
 └── OnDutyService.java (GÜNCELLENDİ - getNextInQueue, moveToEndOfQueue)
@@ -52,7 +52,7 @@ src/main/java/com/api/demo/service/
 
 ### Configuration
 ```
-src/main/java/com/api/demo/config/
+src/main/java/com/api/pako/config/
 └── WebSocketConfig.java
 ```
 

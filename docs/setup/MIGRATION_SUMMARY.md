@@ -172,7 +172,7 @@ i-need-courier/
 │   ├── workflows/ci.yml         # CI/CD pipeline
 │   ├── PULL_REQUEST_TEMPLATE.md
 │   └── ISSUE_TEMPLATE/
-├── src/main/java/com/api/demo/
+├── src/main/java/com/api/pako/
 │   ├── controller/              # REST endpoints
 │   ├── service/                 # Business logic
 │   ├── repository/              # Data access

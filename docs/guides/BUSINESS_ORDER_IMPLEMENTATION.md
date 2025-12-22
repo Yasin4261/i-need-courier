@@ -12,7 +12,7 @@
 
 ### 1. **Model Layer** ✅
 ```
-src/main/java/com/api/demo/model/
+src/main/java/com/api/pako/model/
 ├── Order.java                    ← YENİ (Ana entity)
 └── enums/
     ├── OrderStatus.java         ← YENİ
@@ -32,7 +32,7 @@ src/main/java/com/api/demo/model/
 
 ### 2. **Repository Layer** ✅
 ```
-src/main/java/com/api/demo/repository/
+src/main/java/com/api/pako/repository/
 └── OrderRepository.java         ← YENİ
 ```
 
@@ -45,7 +45,7 @@ src/main/java/com/api/demo/repository/
 
 ### 3. **Service Layer** ✅
 ```
-src/main/java/com/api/demo/business/service/
+src/main/java/com/api/pako/business/service/
 ├── BusinessOrderService.java           ← Interface
 └── impl/
     └── BusinessOrderServiceImpl.java   ← Implementation
@@ -59,7 +59,7 @@ src/main/java/com/api/demo/business/service/
 
 ### 4. **Controller Layer** ✅
 ```
-src/main/java/com/api/demo/business/controller/
+src/main/java/com/api/pako/business/controller/
 └── BusinessOrderController.java        ← REST API
 ```
 
@@ -74,7 +74,7 @@ src/main/java/com/api/demo/business/controller/
 
 ### 5. **DTO Layer** ✅
 ```
-src/main/java/com/api/demo/business/dto/
+src/main/java/com/api/pako/business/dto/
 ├── OrderCreateRequest.java      ← Validation included
 ├── OrderUpdateRequest.java      ← Partial update support
 └── OrderResponse.java           ← Complete order info
@@ -82,7 +82,7 @@ src/main/java/com/api/demo/business/dto/
 
 ### 6. **Exception Handling** ✅
 ```
-src/main/java/com/api/demo/exception/
+src/main/java/com/api/pako/exception/
 ├── OrderNotFoundException.java
 ├── UnauthorizedAccessException.java
 ├── InvalidOrderOperationException.java

@@ -140,7 +140,7 @@ curl -X POST http://localhost:8081/api/v1/auth/login \
 
 ```
 i-need-courier/
-├── src/main/java/com/api/demo/
+├── src/main/java/com/api/pako/
 │   ├── controller/      # REST Controllers
 │   ├── service/         # Business Logic
 │   ├── repository/      # Data Access

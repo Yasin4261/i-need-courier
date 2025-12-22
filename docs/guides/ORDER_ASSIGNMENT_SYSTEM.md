@@ -186,8 +186,8 @@ Terminal'de şu komutu çalıştırın:
 cd /home/yasin/Desktop/repos/i-need-courier
 
 # 1. Enum
-cat > src/main/java/com/api/demo/model/enums/AssignmentAlgorithm.java << 'EOF'
-package com.api.demo.model.enums;
+cat > src/main/java/com/api/pako/model/enums/AssignmentAlgorithm.java << 'EOF'
+package com.api.pako.model.enums;
 
 public enum AssignmentAlgorithm {
     ROUND_ROBIN,
@@ -199,14 +199,14 @@ public enum AssignmentAlgorithm {
 EOF
 
 # 2. Strategy klasörü
-mkdir -p src/main/java/com/api/demo/service/assignment
+mkdir -p src/main/java/com/api/pako/service/assignment
 
 # 3. Interface
-cat > src/main/java/com/api/demo/service/assignment/AssignmentStrategy.java << 'EOF'
-package com.api.demo.service.assignment;
+cat > src/main/java/com/api/pako/service/assignment/AssignmentStrategy.java << 'EOF'
+package com.api.pako.service.assignment;
 
-import com.api.demo.model.Courier;
-import com.api.demo.model.Order;
+import com.api.pako.model.Courier;
+import com.api.pako.model.Order;
 import java.util.List;
 import java.util.Optional;
 
