@@ -1,8 +1,11 @@
 package com.api.pako.exception;
 
+import lombok.Getter;
+
 /**
  * Exception thrown when assignment does not belong to the courier
  */
+@Getter
 public class AssignmentNotOwnedException extends RuntimeException {
 
     private final Long assignmentId;
@@ -14,12 +17,5 @@ public class AssignmentNotOwnedException extends RuntimeException {
         this.courierId = courierId;
     }
 
-    public Long getAssignmentId() {
-        return assignmentId;
-    }
-
-    public Long getCourierId() {
-        return courierId;
-    }
 }
 

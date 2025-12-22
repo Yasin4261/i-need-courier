@@ -1,8 +1,11 @@
 package com.api.pako.exception;
 
+import lombok.Getter;
+
 /**
  * Exception thrown when assignment is not found
  */
+@Getter
 public class AssignmentNotFoundException extends RuntimeException {
 
     private final Long assignmentId;
@@ -12,8 +15,5 @@ public class AssignmentNotFoundException extends RuntimeException {
         this.assignmentId = assignmentId;
     }
 
-    public Long getAssignmentId() {
-        return assignmentId;
-    }
 }
 

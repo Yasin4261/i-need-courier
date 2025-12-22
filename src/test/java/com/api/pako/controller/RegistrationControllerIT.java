@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RegistrationControllerIT extends AbstractIntegrationTest {
@@ -27,7 +25,7 @@ public class RegistrationControllerIT extends AbstractIntegrationTest {
 
     @ParameterizedTest(name = "POST /auth/register{0} returns 400 for empty body", quoteTextArguments = false)
     @ValueSource(strings = {"/courier", "/business"})
-    void postWithoutPathReturnsBadRequestForEmptyBody(String path) throws IOException {
+    void postWithoutPathReturnsBadRequestForEmptyBody(String path) {
         // GIVEN WHEN
         var response = mockMvc.post()
                 .uri("/api/v1/auth/register" + path)
@@ -40,7 +38,7 @@ public class RegistrationControllerIT extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("POST /auth/register/business registers and responds with ApiResponse wrapper")
-    void postToBusinessRegistersABusiness() throws IOException {
+    void postToBusinessRegistersABusiness() {
         // GIVEN
         var request = new BusinessRegistrationRequest();
         request.setName("Crispy Krab");

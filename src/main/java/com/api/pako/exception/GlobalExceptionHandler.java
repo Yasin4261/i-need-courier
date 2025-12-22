@@ -3,6 +3,7 @@ package com.api.pako.exception;
 import com.api.pako.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -358,7 +359,7 @@ public class GlobalExceptionHandler {
         log.warn("Method not supported: {} for {}", ex.getMethod(), request.getRequestURI());
 
         String supportedMethods = ex.getSupportedHttpMethods() != null
-                ? String.join(", ", ex.getSupportedHttpMethods().stream().map(method -> method.name()).toList())
+                ? String.join(", ", ex.getSupportedHttpMethods().stream().map(HttpMethod::name).toList())
                 : "N/A";
 
         ErrorResponse errorResponse = new ErrorResponse(

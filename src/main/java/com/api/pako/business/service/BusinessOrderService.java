@@ -4,6 +4,8 @@ import com.api.pako.business.dto.OrderCreateRequest;
 import com.api.pako.business.dto.OrderResponse;
 import com.api.pako.business.dto.OrderUpdateRequest;
 import com.api.pako.model.enums.OrderStatus;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -82,62 +84,16 @@ public interface BusinessOrderService {
     /**
      * Inner class for order statistics
      */
+    @Setter
+    @Getter
     class OrderStatistics {
+        // Getters and Setters
         private long totalOrders;
         private long pendingOrders;
         private long assignedOrders;
         private long inTransitOrders;
         private long deliveredOrders;
         private long cancelledOrders;
-
-        // Getters and Setters
-        public long getTotalOrders() {
-            return totalOrders;
-        }
-
-        public void setTotalOrders(long totalOrders) {
-            this.totalOrders = totalOrders;
-        }
-
-        public long getPendingOrders() {
-            return pendingOrders;
-        }
-
-        public void setPendingOrders(long pendingOrders) {
-            this.pendingOrders = pendingOrders;
-        }
-
-        public long getAssignedOrders() {
-            return assignedOrders;
-        }
-
-        public void setAssignedOrders(long assignedOrders) {
-            this.assignedOrders = assignedOrders;
-        }
-
-        public long getInTransitOrders() {
-            return inTransitOrders;
-        }
-
-        public void setInTransitOrders(long inTransitOrders) {
-            this.inTransitOrders = inTransitOrders;
-        }
-
-        public long getDeliveredOrders() {
-            return deliveredOrders;
-        }
-
-        public void setDeliveredOrders(long deliveredOrders) {
-            this.deliveredOrders = deliveredOrders;
-        }
-
-        public long getCancelledOrders() {
-            return cancelledOrders;
-        }
-
-        public void setCancelledOrders(long cancelledOrders) {
-            this.cancelledOrders = cancelledOrders;
-        }
     }
 }
 
