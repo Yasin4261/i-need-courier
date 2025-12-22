@@ -188,7 +188,7 @@ ON CONFLICT (courier_id) DO UPDATE SET on_duty_since=now();
 ### Issue: 404 Not Found
 **Solution:**
 - Restart application: `./mvnw spring-boot:run`
-- Check controllers exist in `target/classes/com/api/demo/controller/`
+- Check controllers exist in `target/classes/com/api/pako/controller/`
 
 ### Issue: JWT userId not found
 **Check JWT structure:**

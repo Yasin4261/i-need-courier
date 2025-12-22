@@ -57,7 +57,8 @@ Welcome to the **I Need Courier** documentation! This guide will help you naviga
 - [Docker Setup](../compose.yaml) - Docker configuration
 
 ### 📦 Version Management
-- [Version History](../VERSION.md) - All versions and features
+
+- [Version History](VERSION.md) - All versions and features
 - [Changelog](../CHANGELOG.md) - Detailed changes per version
 - [Migration Summary](setup/MIGRATION_SUMMARY.md) - Migration notes
 
@@ -90,7 +91,8 @@ Welcome to the **I Need Courier** documentation! This guide will help you naviga
 3. [Database Design](DATABASE.md)
 
 ### For Project Managers
-1. [Version History](../VERSION.md)
+
+1. [Version History](VERSION.md)
 2. [Changelog](../CHANGELOG.md)
 3. [README](../README.md)
 
@@ -112,7 +114,7 @@ Welcome to the **I Need Courier** documentation! This guide will help you naviga
 - ✅ Business Self-Registration
 - ✅ Enhanced JWT with Roles
 
-**See:** [Version History](../VERSION.md) | [Changelog](../CHANGELOG.md)
+**See:** [Version History](VERSION.md) | [Changelog](../CHANGELOG.md)
 
 ---
 

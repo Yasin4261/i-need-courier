@@ -2,7 +2,7 @@
 
 > **Modern, Clean Layered Architecture ile geliştirilmiş kurye yönetim sistemi**
 
-[![Version](https://img.shields.io/badge/Version-1.1.0-blue.svg)](VERSION.md)
+[![Version](https://img.shields.io/badge/Version-1.1.0-blue.svg)](docs/VERSION.md)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.7-blue.svg)](https://www.postgresql.org/)
@@ -16,7 +16,7 @@
 ✅ **JWT Role-based Auth** - Enhanced security with role management  
 ✅ **Self Registration** - Courier and Business can register themselves  
 
-[📋 See Full Changelog](CHANGELOG.md) | [📚 Version History](VERSION.md)
+[📋 See Full Changelog](CHANGELOG.md) | [📚 Version History](docs/VERSION.md)
 
 ---
 
@@ -140,7 +140,7 @@ curl -X POST http://localhost:8081/api/v1/auth/login \
 
 ```
 i-need-courier/
-├── src/main/java/com/api/demo/
+├── src/main/java/com/api/pako/
 │   ├── controller/      # REST Controllers
 │   ├── service/         # Business Logic
 │   ├── repository/      # Data Access
@@ -191,7 +191,8 @@ i-need-courier/
 - **[Database for Backend](docs/DATABASE_FOR_BACKEND.md)** - Backend entegrasyonu
 
 ### 📦 Version & Changes
-- **[Version History](VERSION.md)** - Tüm sürüm geçmişi ve roadmap
+
+- **[Version History](docs/VERSION.md)** - Tüm sürüm geçmişi ve roadmap
 - **[Changelog](CHANGELOG.md)** - Detaylı değişiklik listesi
 
 ---

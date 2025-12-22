@@ -90,7 +90,7 @@ Business kullanıcıları için sipariş yönetimi
 
 #### 3. **Clean Folder Structure**
 ```
-src/main/java/com/api/demo/
+src/main/java/com/api/pako/
 │
 ├── 📦 business/
 │   ├── controller/

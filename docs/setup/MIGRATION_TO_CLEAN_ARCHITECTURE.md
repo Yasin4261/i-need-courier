@@ -31,7 +31,7 @@ Successfully migrated the **I Need Courier** project from **Hexagonal Architectu
 ## 🏗️ New Architecture Structure
 
 ```
-src/main/java/com/api/demo/
+src/main/java/com/api/pako/
 ├── controller/          # Presentation Layer - REST API endpoints
 │   └── CourierAuthController.java
 ├── service/            # Application Layer - Business logic
@@ -130,21 +130,21 @@ public class Courier {
 
 ### Files Removed (Old Hexagonal Architecture)
 ```
-❌ src/main/java/com/api/demo/infrastructure/
-❌ src/main/java/com/api/demo/domain/port/
-❌ src/main/java/com/api/demo/application/usecase/
+❌ src/main/java/com/api/pako/infrastructure/
+❌ src/main/java/com/api/pako/domain/port/
+❌ src/main/java/com/api/pako/application/usecase/
 ```
 
 ### Files Created (New Clean Architecture)
 ```
-✅ src/main/java/com/api/demo/controller/CourierAuthController.java
-✅ src/main/java/com/api/demo/service/CourierAuthService.java
-✅ src/main/java/com/api/demo/repository/CourierRepository.java
-✅ src/main/java/com/api/demo/model/Courier.java
-✅ src/main/java/com/api/demo/dto/*.java (6 files)
-✅ src/main/java/com/api/demo/exception/*.java (3 files)
-✅ src/main/java/com/api/demo/config/SecurityConfig.java
-✅ src/main/java/com/api/demo/security/JwtTokenProvider.java
+✅ src/main/java/com/api/pako/controller/CourierAuthController.java
+✅ src/main/java/com/api/pako/service/CourierAuthService.java
+✅ src/main/java/com/api/pako/repository/CourierRepository.java
+✅ src/main/java/com/api/pako/model/Courier.java
+✅ src/main/java/com/api/pako/dto/*.java (6 files)
+✅ src/main/java/com/api/pako/exception/*.java (3 files)
+✅ src/main/java/com/api/pako/config/SecurityConfig.java
+✅ src/main/java/com/api/pako/security/JwtTokenProvider.java
 ```
 
 ### Database Changes
@@ -169,7 +169,7 @@ docker compose up -d postgres
 
 ### 3. Run Application
 ```bash
-java -jar target/demo-0.0.1-SNAPSHOT.jar
+java -jar target/pako-0.0.1-SNAPSHOT.jar
 ```
 
 ### 4. Test Endpoints

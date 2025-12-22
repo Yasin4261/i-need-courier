@@ -410,7 +410,7 @@ The following endpoints are deprecated and will be removed in v2.0.0:
 
 ## Links
 
-- [Version History](VERSION.md)
+- [Version History](docs/VERSION.md)
 - [API Documentation](docs/api/API.md)
 - [Contributing Guide](docs/guides/CONTRIBUTING.md)
 - [GitHub Repository](https://github.com/YOUR_USERNAME/i-need-courier)
