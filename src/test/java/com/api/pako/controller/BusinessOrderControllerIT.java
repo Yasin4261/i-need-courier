@@ -104,7 +104,7 @@ public class BusinessOrderControllerIT extends AbstractIntegrationTest {
         assertThat(actualDto).usingRecursiveComparison()
                 .ignoringFields("createdAt", "orderDate", "updatedAt", "orderNumber")
                 .isEqualTo(expectedResponse);
-        assertThat(json.path("code").asInt()).isEqualTo(200);
+        assertThat(json.path("code").asInt()).isEqualTo(201);
         assertThat(actualDto.getOrderNumber()).matches("ORD-\\d{8}-\\d{3}");
         assertThat(response).hasStatus(HttpStatus.CREATED);
     }

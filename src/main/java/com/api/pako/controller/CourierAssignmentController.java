@@ -3,7 +3,6 @@ package com.api.pako.controller;
 import com.api.pako.dto.ApiResponse;
 import com.api.pako.model.OrderAssignment;
 import com.api.pako.service.OrderAssignmentService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +22,7 @@ public class CourierAssignmentController {
     }
 
     @GetMapping("/pending")
-    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getPendingAssignments(
+    public ApiResponse<List<Map<String, Object>>> getPendingAssignments(
             Authentication authentication) {
 
         Long courierId = extractCourierId(authentication);
@@ -48,22 +47,22 @@ public class CourierAssignmentController {
             return map;
         }).collect(Collectors.toList());
 
-        return ResponseEntity.ok(ApiResponse.success(response, "Bekleyen atamalar"));
+        return ApiResponse.ok(response, "Bekleyen atamalar");
     }
 
     @PostMapping("/{assignmentId}/accept")
-    public ResponseEntity<ApiResponse<Void>> acceptAssignment(
+    public ApiResponse<Void> acceptAssignment(
             Authentication authentication,
             @PathVariable Long assignmentId) {
 
         Long courierId = extractCourierId(authentication);
         orderAssignmentService.acceptAssignment(assignmentId, courierId);
 
-        return ResponseEntity.ok(ApiResponse.success(null, "Sipariş kabul edildi"));
+        return ApiResponse.ok(null, "Sipariş kabul edildi");
     }
 
     @PostMapping("/{assignmentId}/reject")
-    public ResponseEntity<ApiResponse<Void>> rejectAssignment(
+    public ApiResponse<Void> rejectAssignment(
             Authentication authentication,
             @PathVariable Long assignmentId,
             @RequestBody Map<String, String> request) {
@@ -73,7 +72,7 @@ public class CourierAssignmentController {
 
         orderAssignmentService.rejectAssignment(assignmentId, courierId, reason);
 
-        return ResponseEntity.ok(ApiResponse.success(null, "Sipariş reddedildi, başka kuryeye atanıyor"));
+        return ApiResponse.ok(null, "Sipariş reddedildi, başka kuryeye atanıyor");
     }
 
     private Long extractCourierId(Authentication authentication) {

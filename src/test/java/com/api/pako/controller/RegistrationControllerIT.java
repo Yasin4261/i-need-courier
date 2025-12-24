@@ -77,6 +77,7 @@ public class RegistrationControllerIT extends AbstractIntegrationTest {
                 .hasStatus(HttpStatus.OK)
                 .hasContentType(MediaType.APPLICATION_JSON_VALUE)
                 .bodyJson()
+                .hasPath(".respondedAt")
                 .isLenientlyEqualTo(expectedResponse);
     }
 }
