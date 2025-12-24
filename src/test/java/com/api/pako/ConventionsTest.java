@@ -1,5 +1,6 @@
 package com.api.pako;
 
+import com.api.pako.dto.ApiResponse;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
@@ -9,6 +10,7 @@ import lombok.Generated;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
 
 // Ensures architectural conventions are followed
 class ConventionsTest {
@@ -38,6 +40,18 @@ class ConventionsTest {
         var rule = ArchRuleDefinition.noFields()
                 .should().beAnnotatedWith(Autowired.class)
                 .because("Prefer constructor injection over field injection via Autowired");
+        rule.check(SOURCES);
+    }
+
+    @Test
+    @ArchTest
+    void controllersAlwaysReturnApiResponse() {
+        var rule = ArchRuleDefinition.methods()
+                .that().arePublic()
+                .and().areDeclaredInClassesThat()
+                .areAnnotatedWith(RestController.class)
+                .should().haveRawReturnType(ApiResponse.class)
+                .because("Controllers should always return ApiResponse for consistency and error handling");
         rule.check(SOURCES);
     }
 }

@@ -13,8 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,7 +39,7 @@ public class BusinessOrderController {
      */
     @PostMapping
     @Operation(summary = "Create order", description = "Create a new delivery order")
-    public ResponseEntity<ApiResponse<OrderResponse>> createOrder(
+    public ApiResponse<OrderResponse> createOrder(
             @Valid @RequestBody OrderCreateRequest request,
             @RequestHeader("Authorization") String authHeader) {
 
@@ -59,9 +57,7 @@ public class BusinessOrderController {
             // Order is still created, just not assigned yet
         }
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response, "Order created successfully"));
+        return ApiResponse.created(response, "Order created successfully");
     }
 
     /**
@@ -69,7 +65,7 @@ public class BusinessOrderController {
      */
     @GetMapping
     @Operation(summary = "Get all orders", description = "Get all orders for the authenticated business, optionally filtered by status")
-    public ResponseEntity<ApiResponse<List<OrderResponse>>> getAllOrders(
+    public ApiResponse<List<OrderResponse>> getAllOrders(
             @RequestParam(required = false) OrderStatus status,
             @RequestHeader("Authorization") String authHeader) {
 
@@ -81,7 +77,7 @@ public class BusinessOrderController {
                 ? "Orders with status " + status + " fetched successfully"
                 : "All orders fetched successfully";
 
-        return ResponseEntity.ok(ApiResponse.success(orders, message));
+        return ApiResponse.ok(orders, message);
     }
 
     /**
@@ -89,7 +85,7 @@ public class BusinessOrderController {
      */
     @GetMapping("/{orderId}")
     @Operation(summary = "Get order by ID", description = "Get detailed information about a specific order")
-    public ResponseEntity<ApiResponse<OrderResponse>> getOrder(
+    public ApiResponse<OrderResponse> getOrder(
             @PathVariable Long orderId,
             @RequestHeader("Authorization") String authHeader) {
 
@@ -98,7 +94,7 @@ public class BusinessOrderController {
 
         OrderResponse response = orderService.getOrderById(orderId, businessId);
 
-        return ResponseEntity.ok(ApiResponse.success(response, "Order fetched successfully"));
+        return ApiResponse.ok(response, "Order fetched successfully");
     }
 
     /**
@@ -106,7 +102,7 @@ public class BusinessOrderController {
      */
     @PutMapping("/{orderId}")
     @Operation(summary = "Update order", description = "Update an existing order (only PENDING orders can be updated)")
-    public ResponseEntity<ApiResponse<OrderResponse>> updateOrder(
+    public ApiResponse<OrderResponse> updateOrder(
             @PathVariable Long orderId,
             @Valid @RequestBody OrderUpdateRequest request,
             @RequestHeader("Authorization") String authHeader) {
@@ -116,7 +112,7 @@ public class BusinessOrderController {
 
         OrderResponse response = orderService.updateOrder(orderId, request, businessId);
 
-        return ResponseEntity.ok(ApiResponse.success(response, "Order updated successfully"));
+        return ApiResponse.ok(response, "Order updated successfully");
     }
 
     /**
@@ -124,7 +120,7 @@ public class BusinessOrderController {
      */
     @DeleteMapping("/{orderId}")
     @Operation(summary = "Delete order", description = "Delete an order (only PENDING orders can be deleted)")
-    public ResponseEntity<ApiResponse<Void>> deleteOrder(
+    public ApiResponse<Void> deleteOrder(
             @PathVariable Long orderId,
             @RequestHeader("Authorization") String authHeader) {
 
@@ -133,7 +129,7 @@ public class BusinessOrderController {
 
         orderService.deleteOrder(orderId, businessId);
 
-        return ResponseEntity.ok(ApiResponse.success(null, "Order deleted successfully"));
+        return ApiResponse.deleted("Order deleted successfully");
     }
 
     /**
@@ -141,7 +137,7 @@ public class BusinessOrderController {
      */
     @PostMapping("/{orderId}/cancel")
     @Operation(summary = "Cancel order", description = "Cancel an order (only PENDING/ASSIGNED orders can be cancelled)")
-    public ResponseEntity<ApiResponse<OrderResponse>> cancelOrder(
+    public ApiResponse<OrderResponse> cancelOrder(
             @PathVariable Long orderId,
             @RequestParam(required = false) String reason,
             @RequestHeader("Authorization") String authHeader) {
@@ -151,7 +147,7 @@ public class BusinessOrderController {
 
         OrderResponse response = orderService.cancelOrder(orderId, businessId, reason);
 
-        return ResponseEntity.ok(ApiResponse.success(response, "Order cancelled successfully"));
+        return ApiResponse.ok(response, "Order cancelled successfully");
     }
 
     /**
@@ -159,7 +155,7 @@ public class BusinessOrderController {
      */
     @GetMapping("/statistics")
     @Operation(summary = "Get order statistics", description = "Get order statistics for the authenticated business")
-    public ResponseEntity<ApiResponse<BusinessOrderService.OrderStatistics>> getStatistics(
+    public ApiResponse<BusinessOrderService.OrderStatistics> getStatistics(
             @RequestHeader("Authorization") String authHeader) {
 
         Long businessId = extractBusinessIdFromToken(authHeader);
@@ -167,7 +163,7 @@ public class BusinessOrderController {
 
         BusinessOrderService.OrderStatistics stats = orderService.getOrderStatistics(businessId);
 
-        return ResponseEntity.ok(ApiResponse.success(stats, "Statistics fetched successfully"));
+        return ApiResponse.ok(stats, "Statistics fetched successfully");
     }
 
     /**
