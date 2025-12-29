@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -39,13 +38,13 @@ public class RegistrationController {
         description = "Register a new courier with name, email, phone, and password. " +
                      "After registration, use /api/v1/auth/login to get JWT token with COURIER role."
     )
-    public ResponseEntity<ApiResponse<CourierRegistrationResponse>> registerCourier(
+    public ApiResponse<CourierRegistrationResponse> registerCourier(
             @Valid @RequestBody CourierRegistrationRequest request) {
 
         log.info("Courier registration request for: {}", request.getEmail());
 
         CourierRegistrationResponse response = courierRegistrationService.register(request);
-        return ResponseEntity.ok(ApiResponse.success(response, "Courier registration successful"));
+        return ApiResponse.ok(response, "Courier registration successful");
     }
 
     /**
@@ -58,13 +57,13 @@ public class RegistrationController {
                      "Status will be PENDING until approved by admin. " +
                      "After approval and using /api/v1/auth/login, you'll get JWT token with BUSINESS role."
     )
-    public ResponseEntity<ApiResponse<BusinessRegistrationResponse>> registerBusiness(
+    public ApiResponse<BusinessRegistrationResponse> registerBusiness(
             @Valid @RequestBody BusinessRegistrationRequest request) {
 
         log.info("Business registration request for: {}", request.getName());
 
         BusinessRegistrationResponse response = businessRegistrationService.register(request);
-        return ResponseEntity.ok(ApiResponse.success(response, "Business registration successful. Pending approval."));
+        return ApiResponse.ok(response, "Business registration successful. Pending approval.");
     }
 }
 

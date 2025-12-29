@@ -9,7 +9,6 @@ import com.api.pako.model.enums.OrderStatus;
 import com.api.pako.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +26,7 @@ public class CourierOrderController {
      * Get order details
      */
     @GetMapping("/{orderId}")
-    public ResponseEntity<ApiResponse<Order>> getOrder(
+    public ApiResponse<Order> getOrder(
             Authentication authentication,
             @PathVariable Long orderId) {
 
@@ -35,19 +34,19 @@ public class CourierOrderController {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Sipariş bulunamadı"));
 
-        // Verify courier owns this order
+        // Verify courier owns this order - TODO: move this logic to service layer
         if (order.getCourier() == null || !order.getCourier().getId().equals(courierId)) {
             throw new RuntimeException("Bu sipariş size atanmamış");
         }
 
-        return ResponseEntity.ok(ApiResponse.success(order, "Sipariş detayları"));
+        return ApiResponse.ok(order, "Sipariş detayları");
     }
 
     /**
      * Pickup order (mark as PICKED_UP)
      */
     @PostMapping(value = "/{orderId}/pickup", consumes = {"*/*"})
-    public ResponseEntity<ApiResponse<Order>> pickupOrder(
+    public ApiResponse<Order> pickupOrder(
             Authentication authentication,
             @PathVariable Long orderId,
             @RequestParam(required = false) String notes) {
@@ -104,14 +103,14 @@ public class CourierOrderController {
         orderRepository.save(order);
         log.info("Pickup successful - Order {} picked up by courier {}", orderId, courierId);
 
-        return ResponseEntity.ok(ApiResponse.success(order, "Sipariş alındı (PICKED_UP)"));
+        return ApiResponse.ok(order, "Sipariş alındı (PICKED_UP)");
     }
 
     /**
      * Start delivery (mark as IN_TRANSIT)
      */
     @PostMapping("/{orderId}/start-delivery")
-    public ResponseEntity<ApiResponse<Order>> startDelivery(
+    public ApiResponse<Order> startDelivery(
             Authentication authentication,
             @PathVariable Long orderId) {
 
@@ -149,14 +148,14 @@ public class CourierOrderController {
 
         log.info("Start delivery successful - Order {} now IN_TRANSIT by courier {}", orderId, courierId);
 
-        return ResponseEntity.ok(ApiResponse.success(order, "Teslimat başladı (IN_TRANSIT)"));
+        return ApiResponse.ok(order, "Teslimat başladı (IN_TRANSIT)");
     }
 
     /**
      * Complete delivery (mark as DELIVERED)
      */
     @PostMapping(value = "/{orderId}/complete", consumes = {"*/*"})
-    public ResponseEntity<ApiResponse<Order>> completeDelivery(
+    public ApiResponse<Order> completeDelivery(
             Authentication authentication,
             @PathVariable Long orderId,
             @RequestParam(required = false) String notes,
@@ -207,7 +206,7 @@ public class CourierOrderController {
         orderRepository.save(order);
         log.info("Complete delivery successful - Order {} delivered by courier {}", orderId, courierId);
 
-        return ResponseEntity.ok(ApiResponse.success(order, "Sipariş teslim edildi (DELIVERED)"));
+        return ApiResponse.ok(order, "Sipariş teslim edildi (DELIVERED)");
     }
 
     private Long extractCourierId(Authentication authentication) {

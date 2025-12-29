@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,10 +26,10 @@ public class UnifiedAuthController {
         summary = "Unified login for all users",
         description = "Login endpoint for Couriers, Businesses, and Admins. System automatically detects user type."
     )
-    public ResponseEntity<ApiResponse<UnifiedLoginResponse>> login(@Valid @RequestBody UnifiedLoginRequest request) {
+    public ApiResponse<UnifiedLoginResponse> login(@Valid @RequestBody UnifiedLoginRequest request) {
         log.info("Unified login request for: {}", request.getEmail());
         UnifiedLoginResponse response = unifiedAuthService.login(request);
-        return ResponseEntity.ok(ApiResponse.success(response, "Login successful"));
+        return ApiResponse.ok(response, "Login successful");
     }
 }
 
