@@ -23,6 +23,32 @@ public class CourierOrderController {
     private final OrderRepository orderRepository;
 
     /**
+     * Get all orders assigned to the authenticated courier (optionally filtered by status).
+     * Aktif siparişler ve geçmiş için kullanılır.
+     * GET /api/v1/courier/orders?status=DELIVERED
+     */
+    @GetMapping
+    public ApiResponse<java.util.List<Order>> getMyOrders(
+            Authentication authentication,
+            @RequestParam(required = false) OrderStatus status) {
+
+        Long courierId = extractCourierId(authentication);
+        java.util.List<Order> orders = (status != null)
+                ? orderRepository.findByCourierIdAndStatus(courierId, status)
+                : orderRepository.findByCourierId(courierId);
+
+        // En yeni önce
+        orders.sort((a, b) -> {
+            LocalDateTime ua = a.getUpdatedAt() != null ? a.getUpdatedAt() : a.getCreatedAt();
+            LocalDateTime ub = b.getUpdatedAt() != null ? b.getUpdatedAt() : b.getCreatedAt();
+            if (ua == null || ub == null) return 0;
+            return ub.compareTo(ua);
+        });
+
+        return ApiResponse.ok(orders, "Siparişler getirildi");
+    }
+
+    /**
      * Get order details
      */
     @GetMapping("/{orderId}")

@@ -3,27 +3,30 @@ package com.api.pako.service;
 import com.api.pako.model.OrderAssignment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class WebSocketNotificationService {
 
-
     private final SimpMessagingTemplate messagingTemplate;
+    private final SimpUserRegistry userRegistry;
 
-    public WebSocketNotificationService(SimpMessagingTemplate messagingTemplate) {
+    public WebSocketNotificationService(SimpMessagingTemplate messagingTemplate,
+                                        SimpUserRegistry userRegistry) {
         this.messagingTemplate = messagingTemplate;
+        this.userRegistry = userRegistry;
     }
 
     /**
      * Kurye'ye yeni sipariş ataması bildirimi gönder
      */
     public void notifyNewAssignment(OrderAssignment assignment, Map<String, Object> orderDetails) {
-        String destination = "/queue/courier/" + assignment.getCourierId() + "/assignments";
 
         Map<String, Object> notification = new HashMap<>();
         notification.put("type", "NEW_ASSIGNMENT");
@@ -34,8 +37,17 @@ public class WebSocketNotificationService {
         notification.put("orderDetails", orderDetails);
 
         try {
+            // Debug: bağlı kullanıcıları logla
+            var connectedUsers = userRegistry.getUsers().stream()
+                    .map(u -> u.getName() + "(sessions=" + u.getSessions().size() + ")")
+                    .collect(Collectors.joining(", "));
+            log.info("Connected WebSocket users: [{}], total={}", connectedUsers, userRegistry.getUserCount());
+
+            String targetUser = String.valueOf(assignment.getCourierId());
+            log.info("Sending notification to user '{}' at /queue/assignments", targetUser);
+
             messagingTemplate.convertAndSendToUser(
-                String.valueOf(assignment.getCourierId()),
+                    targetUser,
                 "/queue/assignments",
                 notification
             );
@@ -51,7 +63,6 @@ public class WebSocketNotificationService {
      * Business'e sipariş durumu bildirimi gönder
      */
     public void notifyBusinessOrderStatus(Long businessId, Long orderId, String status, String message) {
-        String destination = "/queue/business/" + businessId + "/orders";
 
         Map<String, Object> notification = new HashMap<>();
         notification.put("type", "ORDER_STATUS_UPDATE");
@@ -78,7 +89,6 @@ public class WebSocketNotificationService {
      * Timeout bildirimi (atama iptal edildi, yeni kuryeye gidiyor)
      */
     public void notifyAssignmentTimeout(Long courierId, Long assignmentId) {
-        String destination = "/queue/courier/" + courierId + "/assignments";
 
         Map<String, Object> notification = new HashMap<>();
         notification.put("type", "ASSIGNMENT_TIMEOUT");

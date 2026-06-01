@@ -1,21 +1,16 @@
-package com.api.demo.service;
+package com.api.pako.service;
 
-import com.api.demo.exception.AssignmentExpiredException;
-import com.api.demo.exception.AssignmentNotFoundException;
-import com.api.demo.exception.AssignmentNotOwnedException;
-import com.api.demo.exception.BusinessException;
-import com.api.demo.exception.InvalidAssignmentStatusException;
-import com.api.demo.exception.NoCourierAvailableException;
-import com.api.demo.model.Courier;
-import com.api.demo.model.OnDutyCourier;
-import com.api.demo.model.Order;
-import com.api.demo.model.OrderAssignment;
-import com.api.demo.model.enums.AssignmentStatus;
-import com.api.demo.model.enums.AssignmentType;
-import com.api.demo.model.enums.OrderStatus;
-import com.api.demo.repository.CourierRepository;
-import com.api.demo.repository.OrderAssignmentRepository;
-import com.api.demo.repository.OrderRepository;
+import com.api.pako.exception.*;
+import com.api.pako.model.Courier;
+import com.api.pako.model.OnDutyCourier;
+import com.api.pako.model.Order;
+import com.api.pako.model.OrderAssignment;
+import com.api.pako.model.enums.AssignmentStatus;
+import com.api.pako.model.enums.AssignmentType;
+import com.api.pako.model.enums.OrderStatus;
+import com.api.pako.repository.CourierRepository;
+import com.api.pako.repository.OrderAssignmentRepository;
+import com.api.pako.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,10 +29,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

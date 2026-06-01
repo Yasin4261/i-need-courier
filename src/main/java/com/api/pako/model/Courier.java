@@ -33,6 +33,7 @@ public class Courier {
 
     @Column(name = "password_hash", nullable = false, length = 255)
     @ToString.Exclude
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)

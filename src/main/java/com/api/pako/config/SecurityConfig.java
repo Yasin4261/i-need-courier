@@ -53,6 +53,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                    .requestMatchers("/ws/**").permitAll() // WebSocket - JWT doğrulaması STOMP katmanında yapılır
                 .requestMatchers("/api/v1/courier/shifts/**").authenticated()
                 .requestMatchers("/api/v1/business/**").authenticated()
                 .anyRequest().authenticated()

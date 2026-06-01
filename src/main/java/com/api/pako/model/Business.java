@@ -38,6 +38,7 @@ public class Business {
     private String email;
 
     @Column(name = "password_hash", length = 255)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private String passwordHash;
 
     @Column(nullable = false, length = 20)

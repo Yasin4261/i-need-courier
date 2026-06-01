@@ -71,6 +71,22 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
         order.setDeliveryAddress(request.getDeliveryAddress());
         order.setDeliveryAddressDescription(request.getDeliveryAddressDescription());
 
+        // TODO: Bunu düzelt sadece test içindi kadiköyde olması zorunlu değil
+        // Set coordinates - işletme konumu pickup, müşteri konumu Kadıköy çevresinde fallback
+        // (Geocoding entegrasyonu olmadığı için koordinat yoksa Kadıköy merkezi baz alınır)
+        final double kadikoyLat = 40.9907;
+        final double kadikoyLng = 29.0245;
+        if (business.getLatitude() != null && business.getLongitude() != null) {
+            order.setPickupLatitude(business.getLatitude());
+            order.setPickupLongitude(business.getLongitude());
+        } else {
+            order.setPickupLatitude(kadikoyLat + (Math.random() - 0.5) * 0.02);
+            order.setPickupLongitude(kadikoyLng + (Math.random() - 0.5) * 0.02);
+        }
+        // Müşteri (teslimat) konumu - Kadıköy çevresinde
+        order.setDeliveryLatitude(kadikoyLat + (Math.random() - 0.5) * 0.03);
+        order.setDeliveryLongitude(kadikoyLng + (Math.random() - 0.5) * 0.03);
+
         // Set customer details
         order.setEndCustomerName(request.getEndCustomerName());
         order.setEndCustomerPhone(request.getEndCustomerPhone());
