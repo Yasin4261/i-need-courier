@@ -6,6 +6,7 @@ import com.api.pako.model.enums.OrderStatus;
 import com.api.pako.model.enums.PaymentType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.FieldNameConstants;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Builder
+@FieldNameConstants(asEnum = true)
 public class CourierOrderResponse {
 
     private String orderNumber;

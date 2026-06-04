@@ -104,9 +104,11 @@ com.api.pako
 - Integration test files: `*IT.java` (Failsafe + Testcontainers).
 - The instance of the class under test is **always named `underTest`** (not `service`, not `sut`).
 - No `@Autowired` in test classes either — use constructor or `@InjectMocks`.
+- Verify mock arguments with Mockito `assertArg`, not `ArgumentCaptor` (reserve captors for when the value is needed after verification).
 
 ## Code Style
 
+- **Always use `var` for local variables** (Java local-variable type inference) in both production and test code.
 - Lombok is used heavily (`@Slf4j`, `@RequiredArgsConstructor`, `@Getter`, `@Setter`, `@Builder`, etc.).
 - Entities use `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` and `@ToString.Exclude` on lazy relations to prevent N+1 and infinite recursion.
 - Database enums are stored as `VARCHAR` (not native PG enum types) after migrations V10–V13.
