@@ -77,12 +77,24 @@ public class Order {
     @Column(name = "pickup_contact_person", length = 100)
     private String pickupContactPerson;
 
+    @Column(name = "pickup_latitude")
+    private Double pickupLatitude;
+
+    @Column(name = "pickup_longitude")
+    private Double pickupLongitude;
+
     // Delivery details
     @Column(name = "delivery_address", nullable = false, columnDefinition = "TEXT")
     private String deliveryAddress;
 
     @Column(name = "delivery_address_description", columnDefinition = "TEXT")
     private String deliveryAddressDescription;
+
+    @Column(name = "delivery_latitude")
+    private Double deliveryLatitude;
+
+    @Column(name = "delivery_longitude")
+    private Double deliveryLongitude;
 
     // Package details
     @Column(name = "package_description", columnDefinition = "TEXT")
