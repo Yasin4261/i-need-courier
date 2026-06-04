@@ -435,7 +435,7 @@ class OrderAssignmentServiceTest {
         }
 
         @Test
-        @DisplayName("Reddedilip yeniden atama yapılamazsa BusinessException fırlatılır")
+        @DisplayName("Reddedildikten sonra atanacak kurye yoksa NoCourierAvailableException dışarı yansır")
         void shouldThrowWhenReassignmentFailsAfterRejection() {
             // GIVEN
             when(orderAssignmentRepository.findById(100L)).thenReturn(Optional.of(testAssignment));
@@ -445,12 +445,16 @@ class OrderAssignmentServiceTest {
             when(onDutyService.getNextInQueue()).thenThrow(new RuntimeException("Aktif kurye yok"));
 
             // WHEN & THEN
-            // NoCourierAvailableException fırlatılır, reject içinde BusinessException'a sarılır
+            // Reassign sırasında getNextInQueue() patlar; assignToNextAvailableCourier bunu
+            // NoCourierAvailableException'a çevirir. Bu exception BusinessException OLMADIĞI için
+            // rejectAssignment'taki catch(BusinessException) onu yakalamaz ve aynen dışarı yansır.
             assertThatThrownBy(() -> underTest.rejectAssignment(100L, 10L, "Meşgulüm"))
-                    .isInstanceOf(RuntimeException.class);
+                    .isInstanceOf(NoCourierAvailableException.class);
 
-            // Red yine de kaydedilir
+            // Reassign başarısız olsa bile reddetme kalıcıdır
             assertThat(testAssignment.getStatus()).isEqualTo(AssignmentStatus.REJECTED);
+            assertThat(testAssignment.getRejectionReason()).isEqualTo("Meşgulüm");
+            assertThat(testAssignment.getResponseAt()).isNotNull();
         }
     }
 
@@ -504,7 +508,7 @@ class OrderAssignmentServiceTest {
     class CheckTimeoutsTests {
 
         @Test
-        @DisplayName("Süresi dolmuş atamalar TIMEOUT yapılır ve reassign edilir")
+        @DisplayName("Süresi dolmuş atama TIMEOUT yapılır ve farklı bir kuryeye reassign edilir")
         void shouldTimeoutExpiredAssignmentsAndReassign() {
             // GIVEN
             OrderAssignment expired = new OrderAssignment();
@@ -513,6 +517,19 @@ class OrderAssignmentServiceTest {
             expired.setCourierId(10L);
             expired.setStatus(AssignmentStatus.PENDING);
             expired.setTimeoutAt(OffsetDateTime.now(ZoneOffset.UTC).minusMinutes(1));
+
+            // Timeout olan sipariş (id=5), fixture'daki testOrder'dan (id=1) ayrı olmalı
+            Order order5 = new Order();
+            order5.setId(5L);
+            order5.setPickupAddress("Üsküdar");
+            order5.setDeliveryAddress("Kadıköy");
+
+            // Reassign, timeout olan kuryeden (10) FARKLI bir kuryeye (20) gitmeli
+            OnDutyCourier nextCourier = new OnDutyCourier();
+            nextCourier.setCourierId(20L);
+            nextCourier.setOnDutySince(OffsetDateTime.now(ZoneOffset.UTC));
+            Courier courier20 = new Courier();
+            courier20.setId(20L);
 
             when(orderAssignmentRepository.findByStatusAndTimeoutAtBefore(eq(AssignmentStatus.PENDING), any()))
                     .thenReturn(List.of(expired));
@@ -524,19 +541,36 @@ class OrderAssignmentServiceTest {
             when(orderAssignmentRepository.findByOrderIdAndStatusOrderByAssignedAtDesc(5L, AssignmentStatus.TIMEOUT))
                     .thenReturn(List.of(expired));
             when(onDutyService.countOnDutyCouriers()).thenReturn(3L);
-            when(onDutyService.getNextInQueue()).thenReturn(testOnDutyCourier);
-            when(orderRepository.findById(5L)).thenReturn(Optional.of(testOrder));
-            when(courierRepository.findById(10L)).thenReturn(Optional.of(testCourier));
+            when(onDutyService.getNextInQueue()).thenReturn(nextCourier);
+            when(orderRepository.findById(5L)).thenReturn(Optional.of(order5));
+            when(courierRepository.findById(20L)).thenReturn(Optional.of(courier20));
 
             // WHEN
             underTest.checkTimeouts();
 
             // THEN
+            // 1) Süresi dolan atama TIMEOUT olarak işaretlenir ve kuryeye bildirilir
             assertThat(expired.getStatus()).isEqualTo(AssignmentStatus.TIMEOUT);
             assertThat(expired.getResponseAt()).isNotNull();
             assertThat(expired.getRejectionReason()).contains("süre");
-
             verify(notificationService).notifyAssignmentTimeout(10L, 200L);
+
+            // 2) Sipariş 5, REASSIGNMENT olarak farklı bir kuryeye (20) yeniden atanır
+            ArgumentCaptor<OrderAssignment> captor = ArgumentCaptor.forClass(OrderAssignment.class);
+            verify(orderAssignmentRepository, atLeast(2)).save(captor.capture());
+
+            OrderAssignment reassignment = captor.getAllValues().stream()
+                    .filter(a -> a.getAssignmentType() == AssignmentType.REASSIGNMENT)
+                    .findFirst()
+                    .orElseThrow(() -> new AssertionError("REASSIGNMENT kaydı oluşturulmadı"));
+            assertThat(reassignment.getOrderId()).isEqualTo(5L);
+            assertThat(reassignment.getCourierId())
+                    .isEqualTo(20L)
+                    .isNotEqualTo(expired.getCourierId());
+            assertThat(reassignment.getStatus()).isEqualTo(AssignmentStatus.PENDING);
+
+            // Sipariş yeni kuryeye bağlanır
+            assertThat(order5.getCourier()).isEqualTo(courier20);
         }
 
         @Test
