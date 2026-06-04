@@ -71,19 +71,24 @@ public class BusinessOrderServiceImpl implements BusinessOrderService {
         order.setDeliveryAddress(request.getDeliveryAddress());
         order.setDeliveryAddressDescription(request.getDeliveryAddressDescription());
 
-        // TODO: Bunu düzelt sadece test içindi kadiköyde olması zorunlu değil
-        // Set coordinates - işletme konumu pickup, müşteri konumu Kadıköy çevresinde fallback
-        // (Geocoding entegrasyonu olmadığı için koordinat yoksa Kadıköy merkezi baz alınır)
+        // TODO(#19): Temporary random coordinates — testing stop-gap only, must be removed.
+        //   Target: business coordinates become mandatory (every Business has a real
+        //   latitude/longitude), so pickup is derived from the business location and
+        //   delivery comes from geocoding / client input — never random.
+        //   Blocked: real coordinates are NOT in the database yet, so until businesses are
+        //   backfilled we still fall back to random points around Kadıköy (40.9907, 29.0245)
+        //   so the map feature has something to render. See GitHub issue #19.
         final double kadikoyLat = 40.9907;
         final double kadikoyLng = 29.0245;
         if (business.getLatitude() != null && business.getLongitude() != null) {
             order.setPickupLatitude(business.getLatitude());
             order.setPickupLongitude(business.getLongitude());
         } else {
+            // Fallback until business coordinates are mandatory & backfilled (issue #19)
             order.setPickupLatitude(kadikoyLat + (Math.random() - 0.5) * 0.02);
             order.setPickupLongitude(kadikoyLng + (Math.random() - 0.5) * 0.02);
         }
-        // Müşteri (teslimat) konumu - Kadıköy çevresinde
+        // Delivery coordinates: random fallback until geocoding/client input exists (issue #19)
         order.setDeliveryLatitude(kadikoyLat + (Math.random() - 0.5) * 0.03);
         order.setDeliveryLongitude(kadikoyLng + (Math.random() - 0.5) * 0.03);
 
