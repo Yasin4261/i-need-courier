@@ -37,21 +37,23 @@ public class WebSocketNotificationService {
         notification.put("orderDetails", orderDetails);
 
         try {
-            // Debug: bağlı kullanıcıları logla
-            var connectedUsers = userRegistry.getUsers().stream()
-                    .map(u -> u.getName() + "(sessions=" + u.getSessions().size() + ")")
-                    .collect(Collectors.joining(", "));
-            log.info("Connected WebSocket users: [{}], total={}", connectedUsers, userRegistry.getUserCount());
+            // Bağlı kullanıcıları logla - sadece DEBUG açıkken (user registry taraması pahalı)
+            if (log.isDebugEnabled()) {
+                var connectedUsers = userRegistry.getUsers().stream()
+                        .map(u -> u.getName() + "(sessions=" + u.getSessions().size() + ")")
+                        .collect(Collectors.joining(", "));
+                log.debug("Connected WebSocket users: [{}], total={}", connectedUsers, userRegistry.getUserCount());
+            }
 
-            String targetUser = String.valueOf(assignment.getCourierId());
-            log.info("Sending notification to user '{}' at /queue/assignments", targetUser);
+            var targetUser = String.valueOf(assignment.getCourierId());
+            log.debug("Sending notification to user '{}' at /queue/assignments", targetUser);
 
             messagingTemplate.convertAndSendToUser(
                     targetUser,
                 "/queue/assignments",
                 notification
             );
-            log.info("Sent new assignment notification to courier {}: assignment {}",
+            log.debug("Sent new assignment notification to courier {}: assignment {}",
                        assignment.getCourierId(), assignment.getId());
         } catch (Exception e) {
             log.error("Failed to send WebSocket notification to courier {}: {}",
