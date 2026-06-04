@@ -1,6 +1,7 @@
 package com.api.pako.controller;
 
 import com.api.pako.dto.ApiResponse;
+import com.api.pako.dto.CourierOrderResponse;
 import com.api.pako.exception.InvalidOrderOperationException;
 import com.api.pako.exception.OrderNotFoundException;
 import com.api.pako.exception.UnauthorizedAccessException;
@@ -13,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -28,31 +31,31 @@ public class CourierOrderController {
      * GET /api/v1/courier/orders?status=DELIVERED
      */
     @GetMapping
-    public ApiResponse<java.util.List<Order>> getMyOrders(
+    public ApiResponse<List<CourierOrderResponse>> getMyOrders(
             Authentication authentication,
             @RequestParam(required = false) OrderStatus status) {
 
         Long courierId = extractCourierId(authentication);
-        java.util.List<Order> orders = (status != null)
+        List<Order> orders = (status != null)
                 ? orderRepository.findByCourierIdAndStatus(courierId, status)
                 : orderRepository.findByCourierId(courierId);
 
         // En yeni önce
-        orders.sort((a, b) -> {
-            LocalDateTime ua = a.getUpdatedAt() != null ? a.getUpdatedAt() : a.getCreatedAt();
-            LocalDateTime ub = b.getUpdatedAt() != null ? b.getUpdatedAt() : b.getCreatedAt();
-            if (ua == null || ub == null) return 0;
-            return ub.compareTo(ua);
-        });
+        List<CourierOrderResponse> response = orders.stream()
+                .sorted(Comparator.comparing(
+                        (Order o) -> o.getUpdatedAt() != null ? o.getUpdatedAt() : o.getCreatedAt(),
+                        Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .map(CourierOrderResponse::from)
+                .toList();
 
-        return ApiResponse.ok(orders, "Siparişler getirildi");
+        return ApiResponse.ok(response, "Siparişler getirildi");
     }
 
     /**
      * Get order details
      */
     @GetMapping("/{orderId}")
-    public ApiResponse<Order> getOrder(
+    public ApiResponse<CourierOrderResponse> getOrder(
             Authentication authentication,
             @PathVariable Long orderId) {
 
@@ -65,14 +68,14 @@ public class CourierOrderController {
             throw new RuntimeException("Bu sipariş size atanmamış");
         }
 
-        return ApiResponse.ok(order, "Sipariş detayları");
+        return ApiResponse.ok(CourierOrderResponse.from(order), "Sipariş detayları");
     }
 
     /**
      * Pickup order (mark as PICKED_UP)
      */
     @PostMapping(value = "/{orderId}/pickup", consumes = {"*/*"})
-    public ApiResponse<Order> pickupOrder(
+    public ApiResponse<CourierOrderResponse> pickupOrder(
             Authentication authentication,
             @PathVariable Long orderId,
             @RequestParam(required = false) String notes) {
@@ -129,14 +132,14 @@ public class CourierOrderController {
         orderRepository.save(order);
         log.info("Pickup successful - Order {} picked up by courier {}", orderId, courierId);
 
-        return ApiResponse.ok(order, "Sipariş alındı (PICKED_UP)");
+        return ApiResponse.ok(CourierOrderResponse.from(order), "Sipariş alındı (PICKED_UP)");
     }
 
     /**
      * Start delivery (mark as IN_TRANSIT)
      */
     @PostMapping("/{orderId}/start-delivery")
-    public ApiResponse<Order> startDelivery(
+    public ApiResponse<CourierOrderResponse> startDelivery(
             Authentication authentication,
             @PathVariable Long orderId) {
 
@@ -174,14 +177,14 @@ public class CourierOrderController {
 
         log.info("Start delivery successful - Order {} now IN_TRANSIT by courier {}", orderId, courierId);
 
-        return ApiResponse.ok(order, "Teslimat başladı (IN_TRANSIT)");
+        return ApiResponse.ok(CourierOrderResponse.from(order), "Teslimat başladı (IN_TRANSIT)");
     }
 
     /**
      * Complete delivery (mark as DELIVERED)
      */
     @PostMapping(value = "/{orderId}/complete", consumes = {"*/*"})
-    public ApiResponse<Order> completeDelivery(
+    public ApiResponse<CourierOrderResponse> completeDelivery(
             Authentication authentication,
             @PathVariable Long orderId,
             @RequestParam(required = false) String notes,
@@ -232,7 +235,7 @@ public class CourierOrderController {
         orderRepository.save(order);
         log.info("Complete delivery successful - Order {} delivered by courier {}", orderId, courierId);
 
-        return ApiResponse.ok(order, "Sipariş teslim edildi (DELIVERED)");
+        return ApiResponse.ok(CourierOrderResponse.from(order), "Sipariş teslim edildi (DELIVERED)");
     }
 
     private Long extractCourierId(Authentication authentication) {

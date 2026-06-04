@@ -112,6 +112,10 @@ com.api.pako
 - Database enums are stored as `VARCHAR` (not native PG enum types) after migrations V10–V13.
 - All timestamps use `OffsetDateTime` with `ZoneOffset.UTC` in service layer; entities use `LocalDateTime`.
 
+## Git / Commit Conventions
+
+- **Never add `Co-Authored-By` trailers** (or any AI attribution) to commit messages or PR bodies.
+
 ## Notes for Future Sessions
 
 - Some comments inside service/controller methods are currently in Turkish. These will be translated to English incrementally across future sessions — do **not** batch-translate them all at once.
