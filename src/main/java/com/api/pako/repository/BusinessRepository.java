@@ -4,6 +4,7 @@ import com.api.pako.model.Business;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -52,5 +53,12 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
      * @return true if exists, false otherwise
      */
     boolean existsByPhone(String phone);
+
+    /**
+     * Find businesses that are missing coordinates and need geocoding backfill.
+     *
+     * @return businesses whose latitude or longitude is null
+     */
+    List<Business> findByLatitudeIsNullOrLongitudeIsNull();
 }
 
