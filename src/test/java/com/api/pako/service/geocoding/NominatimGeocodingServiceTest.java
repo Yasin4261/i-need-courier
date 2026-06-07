@@ -34,7 +34,11 @@ class NominatimGeocodingServiceTest {
 
         var builder = RestClient.builder();
         server = MockRestServiceServer.bindTo(builder).build();
-        underTest = new NominatimGeocodingService(properties, builder);
+        var restClient = builder
+                .baseUrl(properties.getNominatim().getBaseUrl())
+                .defaultHeader("User-Agent", properties.getUserAgent())
+                .build();
+        underTest = new NominatimGeocodingService(properties, restClient);
     }
 
     @Test

@@ -31,12 +31,9 @@ public class NominatimGeocodingService implements GeocodingService {
     private final ReentrantLock throttleLock = new ReentrantLock(true);
     private long lastRequestAtNanos;
 
-    public NominatimGeocodingService(GeocodingProperties properties, RestClient.Builder restClientBuilder) {
+    public NominatimGeocodingService(GeocodingProperties properties, RestClient geocodingRestClient) {
         this.properties = properties;
-        this.restClient = restClientBuilder
-                .baseUrl(properties.getNominatim().getBaseUrl())
-                .defaultHeader("User-Agent", properties.getUserAgent())
-                .build();
+        this.restClient = geocodingRestClient;
     }
 
     @Override
