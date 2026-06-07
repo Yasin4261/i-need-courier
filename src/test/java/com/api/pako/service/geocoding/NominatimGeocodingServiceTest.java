@@ -69,6 +69,23 @@ class NominatimGeocodingServiceTest {
     }
 
     @Test
+    void normalizesAbbreviationsAndSeparatorsBeforeQuerying() {
+        // GIVEN a messy Turkish-style address: abbreviated street type, slash-separated
+        // district, and irregular whitespace
+        server.expect(requestTo(startsWith("https://nominatim.test/search")))
+                // expanded "Cad." -> "Caddesi", "/" -> ", ", and collapsed whitespace
+                .andExpect(queryParam("q", "Moda%20Caddesi%20Besiktas,%20Istanbul"))
+                .andRespond(withSuccess("[{\"lat\":\"41.0\",\"lon\":\"29.0\"}]", MediaType.APPLICATION_JSON));
+
+        // WHEN
+        var result = underTest.geocode("Moda Cad.  Besiktas / Istanbul");
+
+        // THEN
+        assertThat(result).isPresent();
+        server.verify();
+    }
+
+    @Test
     void returnsEmptyWhenNoMatch() {
         // GIVEN
         server.expect(requestTo(startsWith("https://nominatim.test/search")))

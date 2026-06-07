@@ -46,13 +46,15 @@ public class NominatimGeocodingService implements GeocodingService {
             return Optional.empty();
         }
 
+        var query = normalize(address);
+
         throttle();
 
         try {
             var results = restClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/search")
-                            .queryParam("q", address)
+                            .queryParam("q", query)
                             .queryParam("format", "jsonv2")
                             .queryParam("limit", 1)
                             .queryParam("countrycodes", properties.getNominatim().getCountryCodes())
@@ -69,6 +71,26 @@ public class NominatimGeocodingService implements GeocodingService {
             log.warn("Geocoding request failed for address '{}': {}", address, ex.getMessage());
             return Optional.empty();
         }
+    }
+
+    /**
+     * Clean up a free-text address to improve the geocoder's hit rate. Turkish addresses are
+     * often written with slash-separated districts and abbreviated street types (e.g.
+     * {@code "... Moda Cad. No:15 Kadıköy/İstanbul"}), which the public Nominatim instance
+     * struggles to match. This expands the common abbreviations, turns {@code /} separators
+     * into commas, and collapses redundant whitespace.
+     */
+    private String normalize(String address) {
+        return address.strip()
+                .replace('/', ',')
+                .replaceAll("(?i)\\bMah\\.", "Mahallesi")
+                .replaceAll("(?i)\\bCad\\.", "Caddesi")
+                .replaceAll("(?i)\\bSok\\.", "Sokak")
+                .replaceAll("(?i)\\bBulv\\.", "Bulvarı")
+                .replaceAll("(?i)\\bApt\\.", "Apartmanı")
+                .replaceAll("\\s*,\\s*", ", ")
+                .replaceAll("\\s+", " ")
+                .strip();
     }
 
     /**
