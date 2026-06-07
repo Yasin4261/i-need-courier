@@ -31,6 +31,8 @@ public class GeocodingProperties {
 
     private final Nominatim nominatim = new Nominatim();
 
+    private final Backfill backfill = new Backfill();
+
     @Getter
     @Setter
     public static class Nominatim {
@@ -40,5 +42,16 @@ public class GeocodingProperties {
 
         /** ISO country code(s) used to bias/limit results, e.g. {@code tr}. */
         private String countryCodes = "tr";
+    }
+
+    @Getter
+    @Setter
+    public static class Backfill {
+
+        /**
+         * When {@code true}, the startup runner geocodes businesses that are still missing
+         * coordinates. Disable to skip the network calls (e.g. in offline/CI environments).
+         */
+        private boolean enabled = true;
     }
 }
